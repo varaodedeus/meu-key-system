@@ -1,12 +1,24 @@
-// Banco de dados em memória
-// ATENÇÃO: Os dados são perdidos quando o servidor reinicia!
-// Para dados permanentes, use: MongoDB Atlas, Supabase, ou Vercel KV
+import { MongoClient } from 'mongodb';
 
-// Armazena usuários
-export const users = new Map();
+const uri = "mongodb+srv://swelokumesd81_db_user:DdYUauy2W9HVvrlV@cluster0.sxwnhrt.mongodb.net/?appName=Cluster0";
 
-// Armazena todas as keys (para busca rápida)
-export const allKeys = new Map();
+let cachedClient = null;
+let cachedDb = null;
+
+export async function connectToDatabase() {
+    if (cachedClient && cachedDb) {
+        return { client: cachedClient, db: cachedDb };
+    }
+
+    const client = new MongoClient(uri);
+    await client.connect();
+    const db = client.db('keysystem');
+
+    cachedClient = client;
+    cachedDb = db;
+
+    return { client, db };
+}
 
 // Função auxiliar para extrair email do token
 export function getUserFromToken(token) {
