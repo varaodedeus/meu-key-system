@@ -1,4 +1,4 @@
-import { allKeys, users } from '../db.js';
+import { connectToDatabase } from '../db.js';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,53 +19,53 @@ export default async function handler(req, res) {
         return res.status(200).json({ valid: false, error: 'Key not provided' });
     }
 
-    let foundKey = allKeys.get(key);
+    try {
+        const { db } = await connectToDatabase();
+        const keysCollection = db.collection('keys');
 
-    if (!foundKey) {
-        for (const [email, user] of users.entries()) {
-            if (!user.keys) continue;
-            const k = user.keys.find(k => k.key === key);
-            if (k) {
-                foundKey = k;
-                break;
+        const foundKey = await keysCollection.findOne({ key });
+
+        if (!foundKey) {
+            return res.status(200).json({ valid: false, error: 'Key not found' });
+        }
+
+        if (foundKey.expiresAt < Date.now()) {
+            await keysCollection.updateOne({ key }, { $set: { active: false } });
+            return res.status(200).json({ valid: false, error: 'Key expired' });
+        }
+
+        if (foundKey.hwid && foundKey.hwid !== hwid) {
+            return res.status(200).json({ valid: false, error: 'Key linked to another device' });
+        }
+
+        if (foundKey.uses >= foundKey.maxUses) {
+            await keysCollection.updateOne({ key }, { $set: { active: false } });
+            return res.status(200).json({ valid: false, error: 'Key usage limit reached' });
+        }
+
+        // Atualizar key
+        await keysCollection.updateOne(
+            { key },
+            { 
+                $set: { hwid: hwid || foundKey.hwid, lastUsed: Date.now() },
+                $inc: { uses: 1 }
             }
-        }
+        );
+
+        const hoursRemaining = Math.floor((foundKey.expiresAt - Date.now()) / (1000 * 60 * 60));
+
+        return res.status(200).json({
+            valid: true,
+            message: 'Key is valid!',
+            data: {
+                owner: foundKey.owner,
+                usesRemaining: foundKey.maxUses - foundKey.uses - 1,
+                expiresIn: `${hoursRemaining}h`
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ valid: false, error: 'Database error' });
     }
-
-    if (!foundKey) {
-        return res.status(200).json({ valid: false, error: 'Key not found' });
-    }
-
-    if (foundKey.expiresAt < Date.now()) {
-        foundKey.active = false;
-        return res.status(200).json({ valid: false, error: 'Key expired' });
-    }
-
-    if (foundKey.hwid && foundKey.hwid !== hwid) {
-        return res.status(200).json({ valid: false, error: 'Key linked to another device' });
-    }
-
-    if (!foundKey.hwid && hwid) {
-        foundKey.hwid = hwid;
-    }
-
-    if (foundKey.uses >= foundKey.maxUses) {
-        foundKey.active = false;
-        return res.status(200).json({ valid: false, error: 'Key usage limit reached' });
-    }
-
-    foundKey.uses++;
-    foundKey.lastUsed = Date.now();
-
-    const hoursRemaining = Math.floor((foundKey.expiresAt - Date.now()) / (1000 * 60 * 60));
-
-    return res.status(200).json({
-        valid: true,
-        message: 'Key is valid!',
-        data: {
-            owner: foundKey.owner,
-            usesRemaining: foundKey.maxUses - foundKey.uses,
-            expiresIn: `${hoursRemaining}h`
-        }
-    });
 }
