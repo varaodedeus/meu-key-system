@@ -29,7 +29,6 @@ export default async function handler(req, res) {
     try {
         const { db } = await connectToDatabase();
         const keysCollection = db.collection('keys');
-        const usersCollection = db.collection('users');
 
         const foundKey = await keysCollection.findOne({ key, owner: email });
 
@@ -37,14 +36,7 @@ export default async function handler(req, res) {
             return res.status(404).json({ error: 'Key not found' });
         }
 
-        // Deletar da coleção de keys
         await keysCollection.deleteOne({ key });
-
-        // Remover do array de keys do usuário
-        await usersCollection.updateOne(
-            { email },
-            { $pull: { keys: { key: key } } }
-        );
 
         return res.status(200).json({
             success: true,
