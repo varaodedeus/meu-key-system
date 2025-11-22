@@ -1,4 +1,4 @@
-import { users } from '../db.js';
+import { connectToDatabase } from '../db.js';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,23 +23,35 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
-    if (users.has(email)) {
-        return res.status(400).json({ error: 'Email already registered' });
+    try {
+        const { db } = await connectToDatabase();
+        const usersCollection = db.collection('users');
+
+        // Verificar se já existe
+        const existingUser = await usersCollection.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email already registered' });
+        }
+
+        // Criar usuário
+        await usersCollection.insertOne({
+            username,
+            email,
+            password,
+            keys: [],
+            createdAt: new Date().toISOString()
+        });
+
+        const token = Buffer.from(`${email}:${Date.now()}`).toString('base64');
+
+        return res.status(201).json({
+            success: true,
+            token,
+            message: 'Account created successfully'
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Database error' });
     }
-
-    users.set(email, {
-        username,
-        email,
-        password,
-        keys: [],
-        createdAt: new Date().toISOString()
-    });
-
-    const token = Buffer.from(`${email}:${Date.now()}`).toString('base64');
-
-    return res.status(201).json({
-        success: true,
-        token,
-        message: 'Account created successfully'
-    });
 }
