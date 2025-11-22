@@ -32,6 +32,7 @@ export default async function handler(req, res) {
             expiresIn: formatTimeRemaining(k.expiresAt),
             uses: k.uses,
             maxUses: k.maxUses,
+            hwid: k.hwid ? true : false,
             createdAt: new Date(k.createdAt).toLocaleDateString()
         }));
 
