@@ -65,7 +65,6 @@
     </header>
 
     <div class="container">
-        <!-- Criar Painel -->
         <div class="card">
             <h2>📁 Create New Panel</h2>
             <div class="form-row">
@@ -75,24 +74,22 @@
             <div id="createMessage" class="message" style="display:none;"></div>
         </div>
 
-        <!-- Lista de Painéis -->
         <div class="card">
             <h2>📋 Your Panels</h2>
             <div class="grid" id="panelsList">
                 <div class="empty-state">
-                    <p>You don't have any panels yet</p>
+                    <p>You dont have any panels yet</p>
                     <p style="font-size:13px;margin-top:5px;">Create your first panel above</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Keys -->
     <div class="modal" id="keysModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">Panel Keys</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <button class="modal-close" onclick="closeModal()">X</button>
             </div>
             <div class="form-row">
                 <select class="form-select" id="keyDuration">
@@ -111,104 +108,97 @@
     </div>
 
     <script>
-        const token = localStorage.getItem('token');
+        var token = localStorage.getItem('token');
         if (!token) window.location.href = '/login.html';
         document.getElementById('userEmail').textContent = localStorage.getItem('userEmail') || 'User';
         
-        let currentPanelId = null;
-        let currentPanelName = '';
+        var currentPanelId = null;
+        var currentPanelName = '';
         loadPanels();
 
-        async function loadPanels() {
-            try {
-                const response = await fetch('/api/panels/list', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const data = await response.json();
-                if (response.ok && data.panels) {
+        function loadPanels() {
+            fetch('/api/panels/list', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.panels) {
                     renderPanels(data.panels);
                 }
-            } catch (error) {
+            })
+            .catch(function(error) {
                 console.error('Error loading panels');
-            }
+            });
         }
 
         function renderPanels(panels) {
-            const container = document.getElementById('panelsList');
+            var container = document.getElementById('panelsList');
             if (panels.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>You don\\'t have any panels yet</p></div>';
+                container.innerHTML = '<div class="empty-state"><p>You dont have any panels yet</p></div>';
                 return;
             }
-            container.innerHTML = panels.map(p => `
-                <div class="panel-item">
-                    <div class="panel-header">
-                        <span class="panel-name">${p.name}</span>
-                        <span class="key-status active">${p.keyCount} keys</span>
-                    </div>
-                    <div class="library-id">
-                        Library ID: ${p.libraryId}
-                        <button class="copy-btn" onclick="copyText('${p.libraryId}')">📋</button>
-                    </div>
-                    <div class="panel-meta">
-                        <span>📅 ${p.createdAt}</span>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-secondary" onclick="openKeys('${p.libraryId}', '${p.name}')">🔑 Keys</button>
-                        <button class="btn btn-secondary" onclick="copyScript('${p.libraryId}')">📜 Script</button>
-                        <button class="btn btn-danger" onclick="deletePanel('${p.libraryId}')">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
+            var html = '';
+            for (var i = 0; i < panels.length; i++) {
+                var p = panels[i];
+                html += '<div class="panel-item">';
+                html += '<div class="panel-header">';
+                html += '<span class="panel-name">' + p.name + '</span>';
+                html += '<span class="key-status active">' + p.keyCount + ' keys</span>';
+                html += '</div>';
+                html += '<div class="library-id">Library ID: ' + p.libraryId + ' <button class="copy-btn" onclick="copyText(\'' + p.libraryId + '\')">📋</button></div>';
+                html += '<div class="panel-meta"><span>📅 ' + p.createdAt + '</span></div>';
+                html += '<div class="btn-group">';
+                html += '<button class="btn btn-secondary" onclick="openKeys(\'' + p.libraryId + '\', \'' + p.name + '\')">🔑 Keys</button>';
+                html += '<button class="btn btn-secondary" onclick="copyScript(\'' + p.libraryId + '\')">📜 Script</button>';
+                html += '<button class="btn btn-danger" onclick="deletePanel(\'' + p.libraryId + '\')">🗑️</button>';
+                html += '</div></div>';
+            }
+            container.innerHTML = html;
         }
 
-        async function createPanel() {
-            const name = document.getElementById('panelName').value.trim();
-            const msg = document.getElementById('createMessage');
+        function createPanel() {
+            var name = document.getElementById('panelName').value.trim();
+            var msg = document.getElementById('createMessage');
             
             if (!name) {
                 showMsg(msg, 'Please enter a panel name', 'error');
                 return;
             }
 
-            try {
-                const response = await fetch('/api/panels/create', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name })
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    showMsg(msg, `✅ Panel "${data.panel.name}" created! Library ID: ${data.panel.libraryId}`, 'success');
+            fetch('/api/panels/create', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showMsg(msg, 'Panel "' + data.panel.name + '" created! Library ID: ' + data.panel.libraryId, 'success');
                     document.getElementById('panelName').value = '';
                     loadPanels();
                 } else {
                     showMsg(msg, data.error || 'Error creating panel', 'error');
                 }
-            } catch (error) {
+            })
+            .catch(function(error) {
                 showMsg(msg, 'Connection error', 'error');
-            }
+            });
         }
 
-        async function deletePanel(libraryId) {
-            if (!confirm('Delete this panel and ALL its keys? This cannot be undone!')) return;
-            try {
-                const response = await fetch('/api/panels/delete', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ libraryId })
-                });
-                if (response.ok) {
-                    loadPanels();
-                }
-            } catch (error) {
-                alert('Error deleting panel');
-            }
+        function deletePanel(libraryId) {
+            if (!confirm('Delete this panel and ALL its keys?')) return;
+            fetch('/api/panels/delete', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ libraryId: libraryId })
+            })
+            .then(function() { loadPanels(); });
         }
 
-        async function openKeys(panelId, panelName) {
+        function openKeys(panelId, panelName) {
             currentPanelId = panelId;
             currentPanelName = panelName;
-            document.getElementById('modalTitle').textContent = `🔑 ${panelName} Keys`;
+            document.getElementById('modalTitle').textContent = '🔑 ' + panelName + ' Keys';
             document.getElementById('keysModal').classList.add('active');
             loadKeys();
         }
@@ -218,84 +208,75 @@
             currentPanelId = null;
         }
 
-        async function loadKeys() {
-            try {
-                const response = await fetch(`/api/keys/list?panelId=${currentPanelId}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const data = await response.json();
+        function loadKeys() {
+            fetch('/api/keys/list?panelId=' + currentPanelId, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
                 renderKeys(data.keys || []);
-            } catch (error) {
-                console.error('Error loading keys');
-            }
+            });
         }
 
         function renderKeys(keys) {
-            const container = document.getElementById('modalKeysList');
+            var container = document.getElementById('modalKeysList');
             if (keys.length === 0) {
                 container.innerHTML = '<div class="empty-state"><p>No keys yet</p></div>';
                 return;
             }
-            container.innerHTML = keys.map(k => `
-                <div class="key-item">
-                    <div>
-                        <div class="key-value">${k.key}</div>
-                        <div class="key-meta">⏰ ${k.expiresIn} | 🖥️ HWID: ${k.hwid ? 'Yes' : 'No'}</div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-secondary" onclick="copyText('${k.key}')" style="padding:6px 12px;">📋</button>
-                        <button class="btn btn-warning" onclick="resetHWID('${k.key}')" style="padding:6px 12px;">🔄</button>
-                        <button class="btn btn-danger" onclick="deleteKey('${k.key}')" style="padding:6px 12px;">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
+            var html = '';
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                html += '<div class="key-item">';
+                html += '<div><div class="key-value">' + k.key + '</div>';
+                html += '<div class="key-meta">⏰ ' + k.expiresIn + ' | 🖥️ HWID: ' + (k.hwid ? 'Yes' : 'No') + '</div></div>';
+                html += '<div class="btn-group">';
+                html += '<button class="btn btn-secondary" onclick="copyText(\'' + k.key + '\')" style="padding:6px 12px;">📋</button>';
+                html += '<button class="btn btn-warning" onclick="resetHWID(\'' + k.key + '\')" style="padding:6px 12px;">🔄</button>';
+                html += '<button class="btn btn-danger" onclick="deleteKey(\'' + k.key + '\')" style="padding:6px 12px;">🗑️</button>';
+                html += '</div></div>';
+            }
+            container.innerHTML = html;
         }
 
-        async function generateKey() {
-            const duration = document.getElementById('keyDuration').value;
-            const msg = document.getElementById('keyMessage');
-            try {
-                const response = await fetch('/api/keys/generate', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ duration: parseInt(duration), panelId: currentPanelId })
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    showMsg(msg, `✅ Key: ${data.key}`, 'success');
+        function generateKey() {
+            var duration = document.getElementById('keyDuration').value;
+            var msg = document.getElementById('keyMessage');
+            fetch('/api/keys/generate', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ duration: parseInt(duration), panelId: currentPanelId })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showMsg(msg, 'Key: ' + data.key, 'success');
                     loadKeys();
                     loadPanels();
                 } else {
                     showMsg(msg, data.error, 'error');
                 }
-            } catch (error) {
-                showMsg(msg, 'Connection error', 'error');
-            }
+            });
         }
 
-        async function resetHWID(key) {
+        function resetHWID(key) {
             if (!confirm('Reset HWID?')) return;
-            try {
-                await fetch('/api/keys/reset-hwid', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ key })
-                });
-                loadKeys();
-            } catch (error) {}
+            fetch('/api/keys/reset-hwid', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key })
+            })
+            .then(function() { loadKeys(); });
         }
 
-        async function deleteKey(key) {
+        function deleteKey(key) {
             if (!confirm('Delete this key?')) return;
-            try {
-                await fetch('/api/keys/delete', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ key })
-                });
-                loadKeys();
-                loadPanels();
-            } catch (error) {}
+            fetch('/api/keys/delete', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key })
+            })
+            .then(function() { loadKeys(); loadPanels(); });
         }
 
         function copyText(text) {
@@ -304,16 +285,16 @@
         }
 
         function copyScript(libraryId) {
-            const script = `loadstring(game:HttpGet("${window.location.origin}/api/lib/${libraryId}"))()`;
+            var script = 'loadstring(game:HttpGet("' + window.location.origin + '/api/lib/' + libraryId + '"))()';
             navigator.clipboard.writeText(script);
-            alert('Script copied!\\n\\n' + script);
+            alert('Script copied!\n\n' + script);
         }
 
         function showMsg(el, text, type) {
             el.className = 'message ' + type;
             el.textContent = text;
             el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 5000);
+            setTimeout(function() { el.style.display = 'none'; }, 5000);
         }
 
         function logout() {
