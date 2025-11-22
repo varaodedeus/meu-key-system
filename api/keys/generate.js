@@ -20,27 +20,34 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    const { duration = 86400, panelId } = req.body;
+
+    if (!panelId) {
+        return res.status(400).json({ error: 'Panel ID is required' });
+    }
+
     try {
         const { db } = await connectToDatabase();
-        const usersCollection = db.collection('users');
+        const panelsCollection = db.collection('panels');
         const keysCollection = db.collection('keys');
 
-        const user = await usersCollection.findOne({ email });
+        // Verificar se painel existe e pertence ao usuário
+        const panel = await panelsCollection.findOne({ libraryId: panelId, owner: email });
 
-        if (!user) {
-            return res.status(401).json({ error: 'User not found' });
+        if (!panel) {
+            return res.status(404).json({ error: 'Panel not found' });
         }
-
-        const { duration = 86400 } = req.body;
 
         const keyValue = generateRandomKey();
         
         const newKey = {
             key: keyValue,
+            panelId,
+            panelName: panel.name,
             owner: email,
             createdAt: Date.now(),
             expiresAt: Date.now() + (duration * 1000),
-            maxUses: 5,
+            maxUses: 999,
             uses: 0,
             active: true,
             hwid: null
@@ -48,15 +55,10 @@ export default async function handler(req, res) {
 
         await keysCollection.insertOne(newKey);
 
-        await usersCollection.updateOne(
-            { email },
-            { $push: { keys: newKey } }
-        );
-
         return res.status(200).json({
             success: true,
             key: keyValue,
-            expiresIn: `${duration / 3600}h`
+            expiresIn: duration >= 31536000 ? 'Lifetime' : `${duration / 86400}d`
         });
 
     } catch (error) {
