@@ -41,6 +41,10 @@ export function generateRandomKey() {
     return key;
 }
 
+export function generateLibraryId() {
+    return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
 export function formatTimeRemaining(expiresAt) {
     const now = Date.now();
     const diff = expiresAt - now;
