@@ -1,0 +1,9 @@
+{
+  "name": "key-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  }
+}
