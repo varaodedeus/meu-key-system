@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScriptsBinsAuth - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            padding: 20px;
+        }
+
+        .header {
+            max-width: 900px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: rgba(30, 30, 50, 0.95);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .header h1 span {
+            color: #8b5cf6;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-email {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            padding: 10px 20px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #f87171;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(30, 30, 50, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-generate svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+
+        .keys-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .key-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .key-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .key-value {
+            font-family: 'Courier New', monospace;
+            color: #8b5cf6;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .key-meta {
+            display: flex;
+            gap: 20px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .key-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .key-status.active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .key-status.expired {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .btn-copy {
+            padding: 10px 20px;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            color: #a78bfa;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-copy:hover {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Scripts<span>Bins</span>Auth</h1>
+        <div class="user-info">
+            <span class="user-email" id="userEmail">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <button class="btn-generate" onclick="generateKey()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                Generate New Key (24h)
+            </button>
+            <div id="generateMessage" class="message" style="display: none;"></div>
+        </div>
+
+        <div class="card">
+            <h2>Your Keys</h2>
+            <div class="keys-list" id="keysList">
+                <div class="empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                    <p>You don't have any keys yet</p>
+                    <p style="font-size: 13px; margin-top: 5px;">Click the button above to generate your first key</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('userEmail').textContent = localStorage.getItem('userEmail') || 'User';
+
+        loadKeys();
+
+        async function loadKeys() {
+            try {
+                const response = await fetch('/api/keys/list', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await response.json();
+
+                if (response.ok && data.keys && data.keys.length > 0) {
+                    renderKeys(data.keys);
+                }
+            } catch (error) {
+                console.error('Error loading keys');
+            }
+        }
+
+        function renderKeys(keys) {
+            const container = document.getElementById('keysList');
+            container.innerHTML = keys.map(k => `
+                <div class="key-item">
+                    <div class="key-info">
+                        <div class="key-value">${k.key}</div>
+                        <div class="key-meta">
+                            <span>⏰ Expires: ${k.expiresIn}</span>
+                            <span>🔢 Uses: ${k.uses}/${k.maxUses}</span>
+                        </div>
+                    </div>
+                    <span class="key-status ${k.active ? 'active' : 'expired'}">${k.active ? 'Active' : 'Expired'}</span>
+                    <button class="btn-copy" onclick="copyKey('${k.key}')">Copy</button>
+                </div>
+            `).join('');
+        }
+
+        async function generateKey() {
+            const msg = document.getElementById('generateMessage');
+            
+            try {
+                const response = await fetch('/api/keys/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ duration: 86400 })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    msg.className = 'message success';
+                    msg.textContent = '✅ Key generated: ' + data.key;
+                    msg.style.display = 'block';
+                    loadKeys();
+                } else {
+                    msg.className = 'message';
+                    msg.style.background = 'rgba(239,68,68,0.2)';
+                    msg.style.color = '#f87171';
+                    msg.textContent = data.error || 'Error generating key';
+                    msg.style.display = 'block';
+                }
+            } catch (error) {
+                msg.textContent = 'Connection error';
+                msg.style.display = 'block';
+            }
+
+            setTimeout(() => msg.style.display = 'none', 5000);
+        }
+
+        function copyKey(key) {
+            navigator.clipboard.writeText(key);
+            const msg = document.getElementById('generateMessage');
+            msg.className = 'message success';
+            msg.textContent = '📋 Key copied to clipboard!';
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 2000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userEmail');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>
