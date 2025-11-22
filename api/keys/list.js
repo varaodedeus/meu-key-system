@@ -20,14 +20,23 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    const panelId = req.query.panelId;
+
     try {
         const { db } = await connectToDatabase();
         const keysCollection = db.collection('keys');
 
-        const userKeys = await keysCollection.find({ owner: email }).toArray();
+        let query = { owner: email };
+        if (panelId) {
+            query.panelId = panelId;
+        }
+
+        const userKeys = await keysCollection.find(query).toArray();
 
         const keys = userKeys.map(k => ({
             key: k.key,
+            panelId: k.panelId,
+            panelName: k.panelName,
             active: k.active && k.expiresAt > Date.now(),
             expiresIn: formatTimeRemaining(k.expiresAt),
             uses: k.uses,
