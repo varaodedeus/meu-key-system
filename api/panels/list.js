@@ -27,16 +27,17 @@ export default async function handler(req, res) {
 
         const userPanels = await panelsCollection.find({ owner: email }).toArray();
 
-        // Contar keys de cada painel
-        const panels = await Promise.all(userPanels.map(async (p) => {
+        const panels = [];
+
+        for (const p of userPanels) {
             const keyCount = await keysCollection.countDocuments({ panelId: p.libraryId });
-            return {
+            panels.push({
                 name: p.name,
                 libraryId: p.libraryId,
-                keyCount,
+                keyCount: keyCount,
                 createdAt: new Date(p.createdAt).toLocaleDateString()
-            };
-        }));
+            });
+        }
 
         return res.status(200).json({
             success: true,
