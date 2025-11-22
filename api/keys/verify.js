@@ -1,19 +1,28 @@
 import { connectToDatabase } from '../db.js';
 
 export default async function handler(req, res) {
+    // CORS headers importantes para Roblox
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
-    if (req.method !== 'POST') {
-        return res.status(405).json({ valid: false, error: 'Method not allowed' });
-    }
+    // Aceitar GET e POST
+    let key, hwid, panelId;
 
-    const { key, hwid, panelId } = req.body;
+    if (req.method === 'GET') {
+        key = req.query.key;
+        hwid = req.query.hwid;
+        panelId = req.query.panelId;
+    } else {
+        key = req.body?.key;
+        hwid = req.body?.hwid;
+        panelId = req.body?.panelId;
+    }
 
     if (!key) {
         return res.status(200).json({ valid: false, error: 'Key not provided' });
@@ -27,11 +36,10 @@ export default async function handler(req, res) {
         const { db } = await connectToDatabase();
         const keysCollection = db.collection('keys');
 
-        // Buscar key do painel específico
         const foundKey = await keysCollection.findOne({ key, panelId });
 
         if (!foundKey) {
-            return res.status(200).json({ valid: false, error: 'Invalid key for this script' });
+            return res.status(200).json({ valid: false, error: 'Invalid key' });
         }
 
         if (foundKey.expiresAt < Date.now()) {
@@ -64,12 +72,12 @@ export default async function handler(req, res) {
             data: {
                 panelName: foundKey.panelName,
                 usesRemaining: foundKey.maxUses - foundKey.uses - 1,
-                expiresIn: hoursRemaining > 24 ? `${Math.floor(hoursRemaining/24)}d` : `${hoursRemaining}h`
+                expiresIn: hoursRemaining > 24 ? Math.floor(hoursRemaining/24) + 'd' : hoursRemaining + 'h'
             }
         });
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ valid: false, error: 'Database error' });
+        return res.status(200).json({ valid: false, error: 'Server error' });
     }
 }
