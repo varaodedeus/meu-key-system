@@ -21,14 +21,13 @@
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .panel-name { color: #8b5cf6; font-size: 18px; font-weight: 600; }
         .panel-meta { color: #888; font-size: 13px; margin-bottom: 15px; }
-        .panel-meta span { margin-right: 15px; }
         .library-id { background: rgba(139,92,246,0.2); color: #a78bfa; padding: 8px 12px; border-radius: 8px; font-family: monospace; font-size: 14px; display: inline-block; margin-bottom: 15px; }
         .btn { padding: 10px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; border: 1px solid; transition: all 0.3s; }
         .btn-primary { background: linear-gradient(135deg, #8b5cf6, #a855f7); border: none; color: #fff; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(139,92,246,0.4); }
         .btn-secondary { background: rgba(139,92,246,0.2); border-color: rgba(139,92,246,0.3); color: #a78bfa; }
         .btn-danger { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); color: #f87171; }
         .btn-warning { background: rgba(251,191,36,0.2); border-color: rgba(251,191,36,0.3); color: #fbbf24; }
+        .btn-success { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.3); color: #4ade80; }
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .form-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .form-input { flex: 1; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; }
@@ -44,15 +43,16 @@
         .key-meta { color: #888; font-size: 12px; }
         .key-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .key-status.active { background: rgba(34,197,94,0.2); color: #4ade80; }
-        .key-status.expired { background: rgba(239,68,68,0.2); color: #f87171; }
         .empty-state { text-align: center; padding: 40px; color: #666; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
         .modal.active { display: flex; }
-        .modal-content { background: rgba(30,30,50,0.98); border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-content { background: rgba(30,30,50,0.98); border-radius: 16px; padding: 30px; max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { color: #fff; font-size: 20px; }
         .modal-close { background: none; border: none; color: #f87171; font-size: 24px; cursor: pointer; }
-        .copy-btn { background: none; border: none; color: #8b5cf6; cursor: pointer; font-size: 12px; }
+        .copy-btn { background: none; border: none; color: #8b5cf6; cursor: pointer; font-size: 12px; margin-left: 5px; }
+        .code-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; margin: 15px 0; max-height: 400px; overflow-y: auto; }
+        .code-box pre { color: #4ade80; font-family: monospace; font-size: 11px; white-space: pre-wrap; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -66,7 +66,7 @@
 
     <div class="container">
         <div class="card">
-            <h2>📁 Create New Panel</h2>
+            <h2>Create New Panel</h2>
             <div class="form-row">
                 <input type="text" class="form-input" id="panelName" placeholder="Panel name (e.g., Auto Rotas)" maxlength="30">
                 <button class="btn btn-primary" onclick="createPanel()">Create Panel</button>
@@ -75,12 +75,9 @@
         </div>
 
         <div class="card">
-            <h2>📋 Your Panels</h2>
+            <h2>Your Panels</h2>
             <div class="grid" id="panelsList">
-                <div class="empty-state">
-                    <p>You dont have any panels yet</p>
-                    <p style="font-size:13px;margin-top:5px;">Create your first panel above</p>
-                </div>
+                <div class="empty-state"><p>You dont have any panels yet</p></div>
             </div>
         </div>
     </div>
@@ -89,7 +86,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">Panel Keys</h3>
-                <button class="modal-close" onclick="closeModal()">X</button>
+                <button class="modal-close" onclick="closeKeysModal()">X</button>
             </div>
             <div class="form-row">
                 <select class="form-select" id="keyDuration">
@@ -100,208 +97,191 @@
                     <option value="31536000">1 Year</option>
                     <option value="315360000">Lifetime</option>
                 </select>
-                <button class="btn btn-primary" onclick="generateKey()">🔑 Generate Key</button>
+                <button class="btn btn-primary" onclick="generateKey()">Generate Key</button>
             </div>
             <div id="keyMessage" class="message" style="display:none;"></div>
             <div class="keys-list" id="modalKeysList"></div>
         </div>
     </div>
 
+    <div class="modal" id="scriptModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="scriptModalTitle">Script Luau</h3>
+                <button class="modal-close" onclick="closeScriptModal()">X</button>
+            </div>
+            <p style="color:#888;margin-bottom:15px;">Copy and paste on Pastefy or Pastebin:</p>
+            <div class="code-box">
+                <pre id="scriptCode"></pre>
+            </div>
+            <button class="btn btn-success" onclick="copyScriptCode()" style="width:100%;">Copy Script</button>
+        </div>
+    </div>
+
     <script>
-        var token = localStorage.getItem('token');
-        if (!token) window.location.href = '/login.html';
-        document.getElementById('userEmail').textContent = localStorage.getItem('userEmail') || 'User';
+        var token = localStorage.getItem("token");
+        if (!token) window.location.href = "/login.html";
+        document.getElementById("userEmail").textContent = localStorage.getItem("userEmail") || "User";
         
         var currentPanelId = null;
-        var currentPanelName = '';
+        var currentScriptCode = "";
         loadPanels();
 
         function loadPanels() {
-            fetch('/api/panels/list', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                if (data.panels) {
-                    renderPanels(data.panels);
-                }
-            })
-            .catch(function(error) {
-                console.error('Error loading panels');
-            });
+            fetch("/api/panels/list", { headers: { "Authorization": "Bearer " + token } })
+            .then(function(r) { return r.json(); })
+            .then(function(data) { if (data.panels) renderPanels(data.panels); });
         }
 
         function renderPanels(panels) {
-            var container = document.getElementById('panelsList');
-            if (panels.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>You dont have any panels yet</p></div>';
-                return;
-            }
-            var html = '';
+            var c = document.getElementById("panelsList");
+            if (panels.length === 0) { c.innerHTML = "<div class='empty-state'><p>No panels yet</p></div>"; return; }
+            var h = "";
             for (var i = 0; i < panels.length; i++) {
                 var p = panels[i];
-                html += '<div class="panel-item">';
-                html += '<div class="panel-header">';
-                html += '<span class="panel-name">' + p.name + '</span>';
-                html += '<span class="key-status active">' + p.keyCount + ' keys</span>';
-                html += '</div>';
-                html += '<div class="library-id">Library ID: ' + p.libraryId + ' <button class="copy-btn" onclick="copyText(\'' + p.libraryId + '\')">📋</button></div>';
-                html += '<div class="panel-meta"><span>📅 ' + p.createdAt + '</span></div>';
-                html += '<div class="btn-group">';
-                html += '<button class="btn btn-secondary" onclick="openKeys(\'' + p.libraryId + '\', \'' + p.name + '\')">🔑 Keys</button>';
-                html += '<button class="btn btn-secondary" onclick="copyScript(\'' + p.libraryId + '\')">📜 Script</button>';
-                html += '<button class="btn btn-danger" onclick="deletePanel(\'' + p.libraryId + '\')">🗑️</button>';
-                html += '</div></div>';
+                h += "<div class='panel-item'><div class='panel-header'><span class='panel-name'>" + p.name + "</span>";
+                h += "<span class='key-status active'>" + p.keyCount + " keys</span></div>";
+                h += "<div class='library-id'>ID: " + p.libraryId + "<button class='copy-btn' onclick=\"copyText('" + p.libraryId + "')\">Copy</button></div>";
+                h += "<div class='panel-meta'>" + p.createdAt + "</div><div class='btn-group'>";
+                h += "<button class='btn btn-secondary' onclick=\"openKeys('" + p.libraryId + "','" + p.name + "')\">Keys</button>";
+                h += "<button class='btn btn-success' onclick=\"openScript('" + p.libraryId + "','" + p.name + "')\">Get Script</button>";
+                h += "<button class='btn btn-danger' onclick=\"deletePanel('" + p.libraryId + "')\">Delete</button></div></div>";
             }
-            container.innerHTML = html;
+            c.innerHTML = h;
         }
 
         function createPanel() {
-            var name = document.getElementById('panelName').value.trim();
-            var msg = document.getElementById('createMessage');
-            
-            if (!name) {
-                showMsg(msg, 'Please enter a panel name', 'error');
-                return;
-            }
-
-            fetch('/api/panels/create', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            var name = document.getElementById("panelName").value.trim();
+            var msg = document.getElementById("createMessage");
+            if (!name) { showMsg(msg, "Enter panel name", "error"); return; }
+            fetch("/api/panels/create", {
+                method: "POST",
+                headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
                 body: JSON.stringify({ name: name })
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    showMsg(msg, 'Panel "' + data.panel.name + '" created! Library ID: ' + data.panel.libraryId, 'success');
-                    document.getElementById('panelName').value = '';
-                    loadPanels();
-                } else {
-                    showMsg(msg, data.error || 'Error creating panel', 'error');
-                }
-            })
-            .catch(function(error) {
-                showMsg(msg, 'Connection error', 'error');
+            }).then(function(r) { return r.json(); }).then(function(data) {
+                if (data.success) { showMsg(msg, "Created! ID: " + data.panel.libraryId, "success"); document.getElementById("panelName").value = ""; loadPanels(); }
+                else { showMsg(msg, data.error, "error"); }
             });
         }
 
-        function deletePanel(libraryId) {
-            if (!confirm('Delete this panel and ALL its keys?')) return;
-            fetch('/api/panels/delete', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ libraryId: libraryId })
-            })
-            .then(function() { loadPanels(); });
+        function deletePanel(id) {
+            if (!confirm("Delete panel?")) return;
+            fetch("/api/panels/delete", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ libraryId: id }) }).then(function() { loadPanels(); });
         }
 
-        function openKeys(panelId, panelName) {
-            currentPanelId = panelId;
-            currentPanelName = panelName;
-            document.getElementById('modalTitle').textContent = '🔑 ' + panelName + ' Keys';
-            document.getElementById('keysModal').classList.add('active');
+        function openKeys(id, name) {
+            currentPanelId = id;
+            document.getElementById("modalTitle").textContent = name + " Keys";
+            document.getElementById("keysModal").classList.add("active");
             loadKeys();
         }
 
-        function closeModal() {
-            document.getElementById('keysModal').classList.remove('active');
-            currentPanelId = null;
-        }
+        function closeKeysModal() { document.getElementById("keysModal").classList.remove("active"); }
 
         function loadKeys() {
-            fetch('/api/keys/list?panelId=' + currentPanelId, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                renderKeys(data.keys || []);
-            });
+            fetch("/api/keys/list?panelId=" + currentPanelId, { headers: { "Authorization": "Bearer " + token } })
+            .then(function(r) { return r.json(); }).then(function(data) { renderKeys(data.keys || []); });
         }
 
         function renderKeys(keys) {
-            var container = document.getElementById('modalKeysList');
-            if (keys.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>No keys yet</p></div>';
-                return;
-            }
-            var html = '';
+            var c = document.getElementById("modalKeysList");
+            if (keys.length === 0) { c.innerHTML = "<div class='empty-state'>No keys</div>"; return; }
+            var h = "";
             for (var i = 0; i < keys.length; i++) {
                 var k = keys[i];
-                html += '<div class="key-item">';
-                html += '<div><div class="key-value">' + k.key + '</div>';
-                html += '<div class="key-meta">⏰ ' + k.expiresIn + ' | 🖥️ HWID: ' + (k.hwid ? 'Yes' : 'No') + '</div></div>';
-                html += '<div class="btn-group">';
-                html += '<button class="btn btn-secondary" onclick="copyText(\'' + k.key + '\')" style="padding:6px 12px;">📋</button>';
-                html += '<button class="btn btn-warning" onclick="resetHWID(\'' + k.key + '\')" style="padding:6px 12px;">🔄</button>';
-                html += '<button class="btn btn-danger" onclick="deleteKey(\'' + k.key + '\')" style="padding:6px 12px;">🗑️</button>';
-                html += '</div></div>';
+                h += "<div class='key-item'><div><div class='key-value'>" + k.key + "</div>";
+                h += "<div class='key-meta'>" + k.expiresIn + " | HWID: " + (k.hwid ? "Yes" : "No") + "</div></div><div class='btn-group'>";
+                h += "<button class='btn btn-secondary' onclick=\"copyText('" + k.key + "')\">Copy</button>";
+                h += "<button class='btn btn-warning' onclick=\"resetHWID('" + k.key + "')\">Reset</button>";
+                h += "<button class='btn btn-danger' onclick=\"deleteKey('" + k.key + "')\">Del</button></div></div>";
             }
-            container.innerHTML = html;
+            c.innerHTML = h;
         }
 
         function generateKey() {
-            var duration = document.getElementById('keyDuration').value;
-            var msg = document.getElementById('keyMessage');
-            fetch('/api/keys/generate', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ duration: parseInt(duration), panelId: currentPanelId })
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    showMsg(msg, 'Key: ' + data.key, 'success');
-                    loadKeys();
-                    loadPanels();
-                } else {
-                    showMsg(msg, data.error, 'error');
-                }
+            var dur = document.getElementById("keyDuration").value;
+            var msg = document.getElementById("keyMessage");
+            fetch("/api/keys/generate", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ duration: parseInt(dur), panelId: currentPanelId }) })
+            .then(function(r) { return r.json(); }).then(function(data) {
+                if (data.success) { showMsg(msg, "Key: " + data.key, "success"); loadKeys(); loadPanels(); }
+                else { showMsg(msg, data.error, "error"); }
             });
         }
 
         function resetHWID(key) {
-            if (!confirm('Reset HWID?')) return;
-            fetch('/api/keys/reset-hwid', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key: key })
-            })
-            .then(function() { loadKeys(); });
+            if (!confirm("Reset HWID?")) return;
+            fetch("/api/keys/reset-hwid", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ key: key }) }).then(function() { loadKeys(); });
         }
 
         function deleteKey(key) {
-            if (!confirm('Delete this key?')) return;
-            fetch('/api/keys/delete', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key: key })
-            })
-            .then(function() { loadKeys(); loadPanels(); });
+            if (!confirm("Delete key?")) return;
+            fetch("/api/keys/delete", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ key: key }) }).then(function() { loadKeys(); loadPanels(); });
         }
 
-        function copyText(text) {
-            navigator.clipboard.writeText(text);
-            alert('Copied!');
+        function openScript(id, name) {
+            var url = window.location.origin;
+            var s = "-- " + name + " Key System\n";
+            s += "-- Library ID: " + id + "\n\n";
+            s += "local API_URL = \"" + url + "/api/keys/verify\"\n";
+            s += "local PANEL_ID = \"" + id + "\"\n";
+            s += "local HttpService = game:GetService(\"HttpService\")\n\n";
+            s += "local function getHWID()\n";
+            s += "    local ok, hwid = pcall(function() return game:GetService(\"RbxAnalyticsService\"):GetClientId() end)\n";
+            s += "    if ok then return hwid else return \"unknown\" end\n";
+            s += "end\n\n";
+            s += "local function verifyKey(key)\n";
+            s += "    local hwid = getHWID()\n";
+            s += "    local url = API_URL .. \"?key=\" .. key .. \"&hwid=\" .. hwid .. \"&panelId=\" .. PANEL_ID\n";
+            s += "    local ok, result = pcall(function()\n";
+            s += "        return HttpService:JSONDecode(game:HttpGet(url))\n";
+            s += "    end)\n";
+            s += "    if ok then return result else return {valid = false, error = \"Connection error\"} end\n";
+            s += "end\n\n";
+            s += "local function createUI()\n";
+            s += "    if game.CoreGui:FindFirstChild(\"KeyUI\") then game.CoreGui.KeyUI:Destroy() end\n";
+            s += "    local SG = Instance.new(\"ScreenGui\") SG.Name = \"KeyUI\" SG.Parent = game.CoreGui\n";
+            s += "    local MF = Instance.new(\"Frame\") MF.Parent = SG MF.BackgroundColor3 = Color3.fromRGB(26,26,46) MF.BorderSizePixel = 0 MF.Position = UDim2.new(0.5,-200,0.5,-140) MF.Size = UDim2.new(0,400,0,280) MF.Active = true MF.Draggable = true\n";
+            s += "    local UC = Instance.new(\"UICorner\") UC.CornerRadius = UDim.new(0,16) UC.Parent = MF\n";
+            s += "    local US = Instance.new(\"UIStroke\") US.Color = Color3.fromRGB(139,92,246) US.Thickness = 2 US.Parent = MF\n";
+            s += "    local TL = Instance.new(\"TextLabel\") TL.Parent = MF TL.BackgroundTransparency = 1 TL.Position = UDim2.new(0,0,0,25) TL.Size = UDim2.new(1,0,0,35) TL.Font = Enum.Font.GothamBold TL.Text = \"" + name + "\" TL.TextColor3 = Color3.fromRGB(139,92,246) TL.TextSize = 22\n";
+            s += "    local ST = Instance.new(\"TextLabel\") ST.Parent = MF ST.BackgroundTransparency = 1 ST.Position = UDim2.new(0,0,0,60) ST.Size = UDim2.new(1,0,0,20) ST.Font = Enum.Font.Gotham ST.Text = \"Enter your key to continue\" ST.TextColor3 = Color3.fromRGB(136,136,136) ST.TextSize = 14\n";
+            s += "    local KB = Instance.new(\"TextBox\") KB.Parent = MF KB.BackgroundColor3 = Color3.fromRGB(40,40,60) KB.BorderSizePixel = 0 KB.Position = UDim2.new(0.1,0,0,100) KB.Size = UDim2.new(0.8,0,0,45) KB.Font = Enum.Font.GothamMedium KB.PlaceholderText = \"KEY-XXXX\" KB.Text = \"\" KB.TextColor3 = Color3.fromRGB(255,255,255) KB.TextSize = 15\n";
+            s += "    local KC = Instance.new(\"UICorner\") KC.CornerRadius = UDim.new(0,10) KC.Parent = KB\n";
+            s += "    local VB = Instance.new(\"TextButton\") VB.Parent = MF VB.BackgroundColor3 = Color3.fromRGB(139,92,246) VB.BorderSizePixel = 0 VB.Position = UDim2.new(0.1,0,0,160) VB.Size = UDim2.new(0.8,0,0,45) VB.Font = Enum.Font.GothamBold VB.Text = \"VERIFY KEY\" VB.TextColor3 = Color3.fromRGB(255,255,255) VB.TextSize = 16\n";
+            s += "    local VC = Instance.new(\"UICorner\") VC.CornerRadius = UDim.new(0,10) VC.Parent = VB\n";
+            s += "    local SL = Instance.new(\"TextLabel\") SL.Parent = MF SL.BackgroundTransparency = 1 SL.Position = UDim2.new(0,0,0,215) SL.Size = UDim2.new(1,0,0,40) SL.Font = Enum.Font.Gotham SL.Text = \"\" SL.TextColor3 = Color3.fromRGB(255,255,255) SL.TextSize = 14 SL.TextWrapped = true\n";
+            s += "    local CB = Instance.new(\"TextButton\") CB.Parent = MF CB.BackgroundTransparency = 1 CB.Position = UDim2.new(1,-35,0,5) CB.Size = UDim2.new(0,30,0,30) CB.Font = Enum.Font.GothamBold CB.Text = \"X\" CB.TextColor3 = Color3.fromRGB(255,100,100) CB.TextSize = 18\n";
+            s += "    CB.MouseButton1Click:Connect(function() SG:Destroy() end)\n";
+            s += "    VB.MouseButton1Click:Connect(function()\n";
+            s += "        local key = KB.Text\n";
+            s += "        if key == \"\" then SL.TextColor3 = Color3.fromRGB(255,100,100) SL.Text = \"Enter a key\" return end\n";
+            s += "        SL.TextColor3 = Color3.fromRGB(255,255,0) SL.Text = \"Verifying...\" VB.Text = \"WAIT...\"\n";
+            s += "        task.wait(0.5)\n";
+            s += "        local result = verifyKey(key)\n";
+            s += "        if result.valid then\n";
+            s += "            SL.TextColor3 = Color3.fromRGB(100,255,100) SL.Text = \"Key valid!\" VB.Text = \"SUCCESS!\"\n";
+            s += "            task.wait(2) SG:Destroy()\n";
+            s += "            print(\"Key verified! Loading...\")\n";
+            s += "            -- PUT YOUR SCRIPT HERE\n";
+            s += "        else\n";
+            s += "            SL.TextColor3 = Color3.fromRGB(255,100,100) SL.Text = result.error or \"Invalid\" VB.Text = \"VERIFY KEY\"\n";
+            s += "        end\n";
+            s += "    end)\n";
+            s += "end\n\n";
+            s += "createUI()\n";
+            s += "print(\"" + name + " loaded!\")";
+
+            currentScriptCode = s;
+            document.getElementById("scriptModalTitle").textContent = name + " Script";
+            document.getElementById("scriptCode").textContent = s;
+            document.getElementById("scriptModal").classList.add("active");
         }
 
-        function copyScript(libraryId) {
-            var script = 'loadstring(game:HttpGet("' + window.location.origin + '/api/lib/' + libraryId + '"))()';
-            navigator.clipboard.writeText(script);
-            alert('Script copied!\n\n' + script);
-        }
-
-        function showMsg(el, text, type) {
-            el.className = 'message ' + type;
-            el.textContent = text;
-            el.style.display = 'block';
-            setTimeout(function() { el.style.display = 'none'; }, 5000);
-        }
-
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userEmail');
-            window.location.href = '/login.html';
-        }
+        function closeScriptModal() { document.getElementById("scriptModal").classList.remove("active"); }
+        function copyScriptCode() { navigator.clipboard.writeText(currentScriptCode); alert("Copied!"); }
+        function copyText(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
+        function showMsg(el, txt, type) { el.className = "message " + type; el.textContent = txt; el.style.display = "block"; setTimeout(function() { el.style.display = "none"; }, 5000); }
+        function logout() { localStorage.removeItem("token"); localStorage.removeItem("userEmail"); window.location.href = "/login.html"; }
     </script>
 </body>
 </html>
