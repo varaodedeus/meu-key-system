@@ -5,225 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ScriptsBinsAuth - Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
-            padding: 20px;
-        }
-        .header {
-            max-width: 900px;
-            margin: 0 auto 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-            background: rgba(30, 30, 50, 0.95);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .header h1 {
-            color: #fff;
-            font-size: 24px;
-        }
-        .header h1 span {
-            color: #8b5cf6;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .user-email {
-            color: #888;
-            font-size: 14px;
-        }
-        .btn-logout {
-            padding: 10px 20px;
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 8px;
-            color: #f87171;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-logout:hover {
-            background: rgba(239, 68, 68, 0.3);
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .card {
-            background: rgba(30, 30, 50, 0.95);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .card h2 {
-            color: #fff;
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
-        .generate-section {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .duration-select {
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 15px;
-            cursor: pointer;
-            min-width: 150px;
-        }
-        .duration-select:focus {
-            outline: none;
-            border-color: #8b5cf6;
-        }
-        .duration-select option {
-            background: #1a1a2e;
-            color: #fff;
-        }
-        .btn-generate {
-            flex: 1;
-            padding: 16px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 200px;
-        }
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
-        }
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-size: 14px;
-            text-align: center;
-        }
-        .message.success {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            color: #4ade80;
-        }
-        .message.error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #f87171;
-        }
-        .keys-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .key-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-        }
-        .key-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .key-value {
-            font-family: 'Courier New', monospace;
-            color: #8b5cf6;
-            font-size: 16px;
-            font-weight: 600;
-            word-break: break-all;
-        }
-        .key-status {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .key-status.active {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-        }
-        .key-status.expired {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-        }
-        .key-meta {
-            display: flex;
-            gap: 20px;
-            color: #888;
-            font-size: 13px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        .key-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .btn-action {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid;
-        }
-        .btn-copy {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(139, 92, 246, 0.3);
-            color: #a78bfa;
-        }
-        .btn-copy:hover {
-            background: rgba(139, 92, 246, 0.3);
-        }
-        .btn-reset {
-            background: rgba(251, 191, 36, 0.2);
-            border-color: rgba(251, 191, 36, 0.3);
-            color: #fbbf24;
-        }
-        .btn-reset:hover {
-            background: rgba(251, 191, 36, 0.3);
-        }
-        .btn-delete {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #f87171;
-        }
-        .btn-delete:hover {
-            background: rgba(239, 68, 68, 0.3);
-        }
-        .empty-state {
-            text-align: center;
-            padding: 50px;
-            color: #666;
-        }
-        .hwid-status {
-            color: #fbbf24;
-            font-size: 12px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { min-height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%); padding: 20px; }
+        .header { max-width: 1100px; margin: 0 auto 30px; display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; background: rgba(30,30,50,0.95); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+        .header h1 { color: #fff; font-size: 24px; }
+        .header h1 span { color: #8b5cf6; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-email { color: #888; font-size: 14px; }
+        .btn-logout { padding: 10px 20px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; color: #f87171; font-size: 14px; cursor: pointer; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .card { background: rgba(30,30,50,0.95); border-radius: 16px; padding: 25px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .card h2 { color: #fff; font-size: 18px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .panel-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .panel-name { color: #8b5cf6; font-size: 18px; font-weight: 600; }
+        .panel-meta { color: #888; font-size: 13px; margin-bottom: 15px; }
+        .panel-meta span { margin-right: 15px; }
+        .library-id { background: rgba(139,92,246,0.2); color: #a78bfa; padding: 8px 12px; border-radius: 8px; font-family: monospace; font-size: 14px; display: inline-block; margin-bottom: 15px; }
+        .btn { padding: 10px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; border: 1px solid; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #8b5cf6, #a855f7); border: none; color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(139,92,246,0.4); }
+        .btn-secondary { background: rgba(139,92,246,0.2); border-color: rgba(139,92,246,0.3); color: #a78bfa; }
+        .btn-danger { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); color: #f87171; }
+        .btn-warning { background: rgba(251,191,36,0.2); border-color: rgba(251,191,36,0.3); color: #fbbf24; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .form-input { flex: 1; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; }
+        .form-input:focus { outline: none; border-color: #8b5cf6; }
+        .form-select { padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; min-width: 120px; }
+        .form-select option { background: #1a1a2e; }
+        .message { padding: 12px; border-radius: 8px; margin: 15px 0; font-size: 14px; text-align: center; }
+        .message.success { background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+        .message.error { background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+        .keys-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .key-item { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .key-value { font-family: monospace; color: #8b5cf6; font-size: 13px; }
+        .key-meta { color: #888; font-size: 12px; }
+        .key-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .key-status.active { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .key-status.expired { background: rgba(239,68,68,0.2); color: #f87171; }
+        .empty-state { text-align: center; padding: 40px; color: #666; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: rgba(30,30,50,0.98); border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { color: #fff; font-size: 20px; }
+        .modal-close { background: none; border: none; color: #f87171; font-size: 24px; cursor: pointer; }
+        .copy-btn { background: none; border: none; color: #8b5cf6; cursor: pointer; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -234,166 +63,257 @@
             <button class="btn-logout" onclick="logout()">Logout</button>
         </div>
     </header>
+
     <div class="container">
+        <!-- Criar Painel -->
         <div class="card">
-            <h2>🔑 Generate New Key</h2>
-            <div class="generate-section">
-                <select class="duration-select" id="durationSelect">
-                    <option value="86400">1 Day (1d)</option>
-                    <option value="604800">7 Days (7d)</option>
-                    <option value="2592000">30 Days (30d)</option>
-                    <option value="7776000">90 Days (90d)</option>
-                    <option value="31536000">1 Year (1a)</option>
-                    <option value="315360000">Lifetime (10a)</option>
-                </select>
-                <button class="btn-generate" onclick="generateKey()">🔑 Generate Key</button>
+            <h2>📁 Create New Panel</h2>
+            <div class="form-row">
+                <input type="text" class="form-input" id="panelName" placeholder="Panel name (e.g., Auto Rotas)" maxlength="30">
+                <button class="btn btn-primary" onclick="createPanel()">Create Panel</button>
             </div>
-            <div id="generateMessage" class="message" style="display: none;"></div>
+            <div id="createMessage" class="message" style="display:none;"></div>
         </div>
+
+        <!-- Lista de Painéis -->
         <div class="card">
-            <h2>Your Keys</h2>
-            <div class="keys-list" id="keysList">
+            <h2>📋 Your Panels</h2>
+            <div class="grid" id="panelsList">
                 <div class="empty-state">
-                    <p>You don't have any keys yet</p>
-                    <p style="font-size: 13px; margin-top: 5px;">Select duration and click generate</p>
+                    <p>You don't have any panels yet</p>
+                    <p style="font-size:13px;margin-top:5px;">Create your first panel above</p>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal de Keys -->
+    <div class="modal" id="keysModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Panel Keys</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-row">
+                <select class="form-select" id="keyDuration">
+                    <option value="86400">1 Day</option>
+                    <option value="604800">7 Days</option>
+                    <option value="2592000">30 Days</option>
+                    <option value="7776000">90 Days</option>
+                    <option value="31536000">1 Year</option>
+                    <option value="315360000">Lifetime</option>
+                </select>
+                <button class="btn btn-primary" onclick="generateKey()">🔑 Generate Key</button>
+            </div>
+            <div id="keyMessage" class="message" style="display:none;"></div>
+            <div class="keys-list" id="modalKeysList"></div>
+        </div>
+    </div>
+
     <script>
         const token = localStorage.getItem('token');
         if (!token) window.location.href = '/login.html';
-
         document.getElementById('userEmail').textContent = localStorage.getItem('userEmail') || 'User';
-        loadKeys();
+        
+        let currentPanelId = null;
+        let currentPanelName = '';
+        loadPanels();
 
-        async function loadKeys() {
+        async function loadPanels() {
             try {
-                const response = await fetch('/api/keys/list', {
+                const response = await fetch('/api/panels/list', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await response.json();
-                if (response.ok && data.keys && data.keys.length > 0) {
-                    renderKeys(data.keys);
+                if (response.ok && data.panels) {
+                    renderPanels(data.panels);
                 }
+            } catch (error) {
+                console.error('Error loading panels');
+            }
+        }
+
+        function renderPanels(panels) {
+            const container = document.getElementById('panelsList');
+            if (panels.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>You don\\'t have any panels yet</p></div>';
+                return;
+            }
+            container.innerHTML = panels.map(p => `
+                <div class="panel-item">
+                    <div class="panel-header">
+                        <span class="panel-name">${p.name}</span>
+                        <span class="key-status active">${p.keyCount} keys</span>
+                    </div>
+                    <div class="library-id">
+                        Library ID: ${p.libraryId}
+                        <button class="copy-btn" onclick="copyText('${p.libraryId}')">📋</button>
+                    </div>
+                    <div class="panel-meta">
+                        <span>📅 ${p.createdAt}</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="openKeys('${p.libraryId}', '${p.name}')">🔑 Keys</button>
+                        <button class="btn btn-secondary" onclick="copyScript('${p.libraryId}')">📜 Script</button>
+                        <button class="btn btn-danger" onclick="deletePanel('${p.libraryId}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function createPanel() {
+            const name = document.getElementById('panelName').value.trim();
+            const msg = document.getElementById('createMessage');
+            
+            if (!name) {
+                showMsg(msg, 'Please enter a panel name', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/panels/create', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMsg(msg, `✅ Panel "${data.panel.name}" created! Library ID: ${data.panel.libraryId}`, 'success');
+                    document.getElementById('panelName').value = '';
+                    loadPanels();
+                } else {
+                    showMsg(msg, data.error || 'Error creating panel', 'error');
+                }
+            } catch (error) {
+                showMsg(msg, 'Connection error', 'error');
+            }
+        }
+
+        async function deletePanel(libraryId) {
+            if (!confirm('Delete this panel and ALL its keys? This cannot be undone!')) return;
+            try {
+                const response = await fetch('/api/panels/delete', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ libraryId })
+                });
+                if (response.ok) {
+                    loadPanels();
+                }
+            } catch (error) {
+                alert('Error deleting panel');
+            }
+        }
+
+        async function openKeys(panelId, panelName) {
+            currentPanelId = panelId;
+            currentPanelName = panelName;
+            document.getElementById('modalTitle').textContent = `🔑 ${panelName} Keys`;
+            document.getElementById('keysModal').classList.add('active');
+            loadKeys();
+        }
+
+        function closeModal() {
+            document.getElementById('keysModal').classList.remove('active');
+            currentPanelId = null;
+        }
+
+        async function loadKeys() {
+            try {
+                const response = await fetch(`/api/keys/list?panelId=${currentPanelId}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await response.json();
+                renderKeys(data.keys || []);
             } catch (error) {
                 console.error('Error loading keys');
             }
         }
 
         function renderKeys(keys) {
-            const container = document.getElementById('keysList');
+            const container = document.getElementById('modalKeysList');
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No keys yet</p></div>';
+                return;
+            }
             container.innerHTML = keys.map(k => `
                 <div class="key-item">
-                    <div class="key-header">
+                    <div>
                         <div class="key-value">${k.key}</div>
-                        <span class="key-status ${k.active ? 'active' : 'expired'}">${k.active ? 'Active' : 'Expired'}</span>
+                        <div class="key-meta">⏰ ${k.expiresIn} | 🖥️ HWID: ${k.hwid ? 'Yes' : 'No'}</div>
                     </div>
-                    <div class="key-meta">
-                        <span>⏰ Expires: ${k.expiresIn}</span>
-                        <span>🔢 Uses: ${k.uses}/${k.maxUses}</span>
-                        <span class="hwid-status">🖥️ HWID: ${k.hwid ? 'Linked' : 'Not linked'}</span>
-                    </div>
-                    <div class="key-actions">
-                        <button class="btn-action btn-copy" onclick="copyKey('${k.key}')">📋 Copy</button>
-                        <button class="btn-action btn-reset" onclick="resetHWID('${k.key}')">🔄 Reset HWID</button>
-                        <button class="btn-action btn-delete" onclick="deleteKey('${k.key}')">🗑️ Delete</button>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="copyText('${k.key}')" style="padding:6px 12px;">📋</button>
+                        <button class="btn btn-warning" onclick="resetHWID('${k.key}')" style="padding:6px 12px;">🔄</button>
+                        <button class="btn btn-danger" onclick="deleteKey('${k.key}')" style="padding:6px 12px;">🗑️</button>
                     </div>
                 </div>
             `).join('');
         }
 
         async function generateKey() {
-            const duration = document.getElementById('durationSelect').value;
-            const msg = document.getElementById('generateMessage');
-            
+            const duration = document.getElementById('keyDuration').value;
+            const msg = document.getElementById('keyMessage');
             try {
                 const response = await fetch('/api/keys/generate', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ duration: parseInt(duration) })
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ duration: parseInt(duration), panelId: currentPanelId })
                 });
                 const data = await response.json();
                 if (response.ok) {
-                    msg.className = 'message success';
-                    msg.textContent = '✅ Key generated: ' + data.key;
-                    msg.style.display = 'block';
+                    showMsg(msg, `✅ Key: ${data.key}`, 'success');
                     loadKeys();
+                    loadPanels();
                 } else {
-                    msg.className = 'message error';
-                    msg.textContent = data.error || 'Error generating key';
-                    msg.style.display = 'block';
+                    showMsg(msg, data.error, 'error');
                 }
             } catch (error) {
-                msg.className = 'message error';
-                msg.textContent = 'Connection error';
-                msg.style.display = 'block';
+                showMsg(msg, 'Connection error', 'error');
             }
-            setTimeout(() => msg.style.display = 'none', 5000);
-        }
-
-        function copyKey(key) {
-            navigator.clipboard.writeText(key);
-            showMessage('📋 Key copied!', 'success');
         }
 
         async function resetHWID(key) {
-            if (!confirm('Reset HWID for this key? The key can be used on a new device.')) return;
-            
+            if (!confirm('Reset HWID?')) return;
             try {
-                const response = await fetch('/api/keys/reset-hwid', {
+                await fetch('/api/keys/reset-hwid', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ key })
                 });
-                const data = await response.json();
-                if (response.ok) {
-                    showMessage('✅ HWID reset successfully!', 'success');
-                    loadKeys();
-                } else {
-                    showMessage(data.error || 'Error resetting HWID', 'error');
-                }
-            } catch (error) {
-                showMessage('Connection error', 'error');
-            }
+                loadKeys();
+            } catch (error) {}
         }
 
         async function deleteKey(key) {
-            if (!confirm('Delete this key? This action cannot be undone.')) return;
-            
+            if (!confirm('Delete this key?')) return;
             try {
-                const response = await fetch('/api/keys/delete', {
+                await fetch('/api/keys/delete', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ key })
                 });
-                const data = await response.json();
-                if (response.ok) {
-                    showMessage('✅ Key deleted!', 'success');
-                    loadKeys();
-                } else {
-                    showMessage(data.error || 'Error deleting key', 'error');
-                }
-            } catch (error) {
-                showMessage('Connection error', 'error');
-            }
+                loadKeys();
+                loadPanels();
+            } catch (error) {}
         }
 
-        function showMessage(text, type) {
-            const msg = document.getElementById('generateMessage');
-            msg.className = 'message ' + type;
-            msg.textContent = text;
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 3000);
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            alert('Copied!');
+        }
+
+        function copyScript(libraryId) {
+            const script = `loadstring(game:HttpGet("${window.location.origin}/api/lib/${libraryId}"))()`;
+            navigator.clipboard.writeText(script);
+            alert('Script copied!\\n\\n' + script);
+        }
+
+        function showMsg(el, text, type) {
+            el.className = 'message ' + type;
+            el.textContent = text;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
         }
 
         function logout() {
