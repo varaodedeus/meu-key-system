@@ -1,4 +1,4 @@
-import { users, getUserFromToken, formatTimeRemaining } from '../db.js';
+import { connectToDatabase, getUserFromToken, formatTimeRemaining } from '../db.js';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,23 +20,28 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const user = users.get(email);
+    try {
+        const { db } = await connectToDatabase();
+        const keysCollection = db.collection('keys');
 
-    if (!user) {
-        return res.status(401).json({ error: 'User not found' });
+        const userKeys = await keysCollection.find({ owner: email }).toArray();
+
+        const keys = userKeys.map(k => ({
+            key: k.key,
+            active: k.active && k.expiresAt > Date.now(),
+            expiresIn: formatTimeRemaining(k.expiresAt),
+            uses: k.uses,
+            maxUses: k.maxUses,
+            createdAt: new Date(k.createdAt).toLocaleDateString()
+        }));
+
+        return res.status(200).json({
+            success: true,
+            keys
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Database error' });
     }
-
-    const keys = (user.keys || []).map(k => ({
-        key: k.key,
-        active: k.active && k.expiresAt > Date.now(),
-        expiresIn: formatTimeRemaining(k.expiresAt),
-        uses: k.uses,
-        maxUses: k.maxUses,
-        createdAt: new Date(k.createdAt).toLocaleDateString()
-    }));
-
-    return res.status(200).json({
-        success: true,
-        keys
-    });
 }
