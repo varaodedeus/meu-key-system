@@ -13,20 +13,25 @@ export default async function handler(req, res) {
         return res.status(405).json({ valid: false, error: 'Method not allowed' });
     }
 
-    const { key, hwid } = req.body;
+    const { key, hwid, panelId } = req.body;
 
     if (!key) {
         return res.status(200).json({ valid: false, error: 'Key not provided' });
+    }
+
+    if (!panelId) {
+        return res.status(200).json({ valid: false, error: 'Panel ID not provided' });
     }
 
     try {
         const { db } = await connectToDatabase();
         const keysCollection = db.collection('keys');
 
-        const foundKey = await keysCollection.findOne({ key });
+        // Buscar key do painel específico
+        const foundKey = await keysCollection.findOne({ key, panelId });
 
         if (!foundKey) {
-            return res.status(200).json({ valid: false, error: 'Key not found' });
+            return res.status(200).json({ valid: false, error: 'Invalid key for this script' });
         }
 
         if (foundKey.expiresAt < Date.now()) {
@@ -57,9 +62,9 @@ export default async function handler(req, res) {
             valid: true,
             message: 'Key is valid!',
             data: {
-                owner: foundKey.owner,
+                panelName: foundKey.panelName,
                 usesRemaining: foundKey.maxUses - foundKey.uses - 1,
-                expiresIn: `${hoursRemaining}h`
+                expiresIn: hoursRemaining > 24 ? `${Math.floor(hoursRemaining/24)}d` : `${hoursRemaining}h`
             }
         });
 
