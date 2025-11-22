@@ -72,8 +72,31 @@
             font-size: 20px;
             margin-bottom: 20px;
         }
+        .generate-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .duration-select {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+            min-width: 150px;
+        }
+        .duration-select:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+        .duration-select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
         .btn-generate {
-            width: 100%;
+            flex: 1;
             padding: 16px;
             background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
             border: none;
@@ -83,6 +106,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 200px;
         }
         .btn-generate:hover {
             transform: translateY(-2px);
@@ -115,29 +139,21 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 20px;
+        }
+        .key-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
-        }
-        .key-info {
-            flex: 1;
-            min-width: 200px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
         .key-value {
             font-family: 'Courier New', monospace;
             color: #8b5cf6;
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 8px;
             word-break: break-all;
-        }
-        .key-meta {
-            display: flex;
-            gap: 20px;
-            color: #888;
-            font-size: 13px;
         }
         .key-status {
             display: inline-block;
@@ -154,23 +170,59 @@
             background: rgba(239, 68, 68, 0.2);
             color: #f87171;
         }
-        .btn-copy {
-            padding: 10px 20px;
-            background: rgba(139, 92, 246, 0.2);
-            border: 1px solid rgba(139, 92, 246, 0.3);
+        .key-meta {
+            display: flex;
+            gap: 20px;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .key-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-action {
+            padding: 8px 16px;
             border-radius: 8px;
-            color: #a78bfa;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s ease;
+            border: 1px solid;
+        }
+        .btn-copy {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
         }
         .btn-copy:hover {
             background: rgba(139, 92, 246, 0.3);
+        }
+        .btn-reset {
+            background: rgba(251, 191, 36, 0.2);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+        }
+        .btn-reset:hover {
+            background: rgba(251, 191, 36, 0.3);
+        }
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.3);
         }
         .empty-state {
             text-align: center;
             padding: 50px;
             color: #666;
+        }
+        .hwid-status {
+            color: #fbbf24;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -184,7 +236,18 @@
     </header>
     <div class="container">
         <div class="card">
-            <button class="btn-generate" onclick="generateKey()">🔑 Generate New Key (24h)</button>
+            <h2>🔑 Generate New Key</h2>
+            <div class="generate-section">
+                <select class="duration-select" id="durationSelect">
+                    <option value="86400">1 Day (1d)</option>
+                    <option value="604800">7 Days (7d)</option>
+                    <option value="2592000">30 Days (30d)</option>
+                    <option value="7776000">90 Days (90d)</option>
+                    <option value="31536000">1 Year (1a)</option>
+                    <option value="315360000">Lifetime (10a)</option>
+                </select>
+                <button class="btn-generate" onclick="generateKey()">🔑 Generate Key</button>
+            </div>
             <div id="generateMessage" class="message" style="display: none;"></div>
         </div>
         <div class="card">
@@ -192,7 +255,7 @@
             <div class="keys-list" id="keysList">
                 <div class="empty-state">
                     <p>You don't have any keys yet</p>
-                    <p style="font-size: 13px; margin-top: 5px;">Click the button above to generate your first key</p>
+                    <p style="font-size: 13px; margin-top: 5px;">Select duration and click generate</p>
                 </div>
             </div>
         </div>
@@ -222,21 +285,28 @@
             const container = document.getElementById('keysList');
             container.innerHTML = keys.map(k => `
                 <div class="key-item">
-                    <div class="key-info">
+                    <div class="key-header">
                         <div class="key-value">${k.key}</div>
-                        <div class="key-meta">
-                            <span>⏰ Expires: ${k.expiresIn}</span>
-                            <span>🔢 Uses: ${k.uses}/${k.maxUses}</span>
-                        </div>
+                        <span class="key-status ${k.active ? 'active' : 'expired'}">${k.active ? 'Active' : 'Expired'}</span>
                     </div>
-                    <span class="key-status ${k.active ? 'active' : 'expired'}">${k.active ? 'Active' : 'Expired'}</span>
-                    <button class="btn-copy" onclick="copyKey('${k.key}')">Copy</button>
+                    <div class="key-meta">
+                        <span>⏰ Expires: ${k.expiresIn}</span>
+                        <span>🔢 Uses: ${k.uses}/${k.maxUses}</span>
+                        <span class="hwid-status">🖥️ HWID: ${k.hwid ? 'Linked' : 'Not linked'}</span>
+                    </div>
+                    <div class="key-actions">
+                        <button class="btn-action btn-copy" onclick="copyKey('${k.key}')">📋 Copy</button>
+                        <button class="btn-action btn-reset" onclick="resetHWID('${k.key}')">🔄 Reset HWID</button>
+                        <button class="btn-action btn-delete" onclick="deleteKey('${k.key}')">🗑️ Delete</button>
+                    </div>
                 </div>
             `).join('');
         }
 
         async function generateKey() {
+            const duration = document.getElementById('durationSelect').value;
             const msg = document.getElementById('generateMessage');
+            
             try {
                 const response = await fetch('/api/keys/generate', {
                     method: 'POST',
@@ -244,7 +314,7 @@
                         'Authorization': 'Bearer ' + token,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ duration: 86400 })
+                    body: JSON.stringify({ duration: parseInt(duration) })
                 });
                 const data = await response.json();
                 if (response.ok) {
@@ -267,11 +337,63 @@
 
         function copyKey(key) {
             navigator.clipboard.writeText(key);
+            showMessage('📋 Key copied!', 'success');
+        }
+
+        async function resetHWID(key) {
+            if (!confirm('Reset HWID for this key? The key can be used on a new device.')) return;
+            
+            try {
+                const response = await fetch('/api/keys/reset-hwid', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ key })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage('✅ HWID reset successfully!', 'success');
+                    loadKeys();
+                } else {
+                    showMessage(data.error || 'Error resetting HWID', 'error');
+                }
+            } catch (error) {
+                showMessage('Connection error', 'error');
+            }
+        }
+
+        async function deleteKey(key) {
+            if (!confirm('Delete this key? This action cannot be undone.')) return;
+            
+            try {
+                const response = await fetch('/api/keys/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ key })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage('✅ Key deleted!', 'success');
+                    loadKeys();
+                } else {
+                    showMessage(data.error || 'Error deleting key', 'error');
+                }
+            } catch (error) {
+                showMessage('Connection error', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
             const msg = document.getElementById('generateMessage');
-            msg.className = 'message success';
-            msg.textContent = '📋 Key copied!';
+            msg.className = 'message ' + type;
+            msg.textContent = text;
             msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 2000);
+            setTimeout(() => msg.style.display = 'none', 3000);
         }
 
         function logout() {
