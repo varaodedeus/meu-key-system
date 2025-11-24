@@ -5,101 +5,193 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LuaExpress Dashboard</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;background:#0a0a12;padding:20px;font-family:system-ui,sans-serif;overflow-x:hidden}
-.bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(139,92,246,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.03) 1px,transparent 1px);background-size:50px 50px;z-index:-2}
-.glow{position:fixed;width:600px;height:600px;border-radius:50%;filter:blur(150px);opacity:0.12;z-index:-1;animation:pulse 10s ease-in-out infinite}
-.glow1{background:#8b5cf6;top:-250px;left:-250px}
-.glow2{background:#ec4899;bottom:-250px;right:-250px;animation-delay:5s}
-@keyframes pulse{0%,100%{opacity:0.1;transform:scale(1)}50%{opacity:0.15;transform:scale(1.2)}}
-.header{max-width:1200px;margin:0 auto 30px;display:flex;justify-content:space-between;align-items:center;padding:25px 35px;background:rgba(20,15,40,0.95);border-radius:20px;border:1px solid rgba(139,92,246,0.25);backdrop-filter:blur(20px);animation:slideDown 0.6s ease;box-shadow:0 10px 50px rgba(0,0,0,0.3)}
-@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-.logo{display:flex;align-items:center;gap:15px}
-.logo-icon{width:55px;height:55px;background:linear-gradient(135deg,#8b5cf6,#ec4899);border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 25px rgba(139,92,246,0.4);animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.header h1{font-size:28px;font-weight:900;background:linear-gradient(135deg,#8b5cf6,#ec4899,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradient 6s ease infinite;background-size:200% 200%}
-@keyframes gradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.user-info{display:flex;align-items:center;gap:15px}
-.user-email{color:#a78bfa;font-size:14px;padding:10px 18px;background:rgba(139,92,246,0.15);border-radius:20px;border:1px solid rgba(139,92,246,0.25);animation:fadeIn 0.8s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.btn-logout{padding:12px 24px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.35);border-radius:14px;color:#f87171;cursor:pointer;font-weight:600;transition:all 0.3s;text-transform:uppercase;letter-spacing:0.5px}
-.btn-logout:hover{background:rgba(239,68,68,0.3);transform:translateY(-2px);box-shadow:0 8px 25px rgba(239,68,68,0.3)}
-.container{max-width:1200px;margin:0 auto}
-.card{background:rgba(20,15,40,0.95);border-radius:20px;padding:32px;margin-bottom:25px;border:1px solid rgba(139,92,246,0.2);backdrop-filter:blur(20px);position:relative;overflow:hidden;animation:slideUp 0.6s ease;box-shadow:0 10px 50px rgba(0,0,0,0.3)}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#8b5cf6,#ec4899,#06b6d4)}
-.card h2{color:#fff;font-size:22px;margin-bottom:25px;font-weight:700;display:flex;align-items:center;gap:12px}
-.card h2::before{content:'⚡';font-size:22px;animation:pulse2 2s ease infinite}
-@keyframes pulse2{0%,100%{opacity:1}50%{opacity:0.5}}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
-.panel-item{background:linear-gradient(145deg,rgba(30,20,60,0.9),rgba(20,15,45,0.9));border:1px solid rgba(139,92,246,0.25);border-radius:18px;padding:25px;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;animation:fadeInScale 0.5s ease}
-@keyframes fadeInScale{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
-.panel-item::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(139,92,246,0.08) 0%,transparent 70%);opacity:0;transition:opacity 0.4s}
-.panel-item:hover::before{opacity:1}
-.panel-item:hover{border-color:rgba(139,92,246,0.6);transform:translateY(-8px) scale(1.02);box-shadow:0 20px 60px rgba(139,92,246,0.25)}
-.panel-name{color:#fff;font-size:20px;font-weight:700;margin-bottom:12px}
-.library-id{background:linear-gradient(135deg,rgba(139,92,246,0.25),rgba(236,72,153,0.2));color:#e0b3ff;padding:14px 18px;border-radius:14px;font-family:monospace;font-size:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border:1px solid rgba(139,92,246,0.3)}
-.panel-meta{color:#888;font-size:13px;margin-bottom:18px}
-.btn{padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.3s;text-transform:uppercase;letter-spacing:0.5px}
-.btn-primary{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;box-shadow:0 4px 20px rgba(139,92,246,0.4)}
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(139,92,246,0.6)}
-.btn-secondary{background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.35);color:#a78bfa}
-.btn-secondary:hover{background:rgba(139,92,246,0.3);transform:translateY(-2px)}
-.btn-danger{background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.35);color:#f87171}
-.btn-danger:hover{background:rgba(239,68,68,0.3);transform:translateY(-2px)}
-.btn-warning{background:rgba(251,191,36,0.2);border:1px solid rgba(251,191,36,0.35);color:#fbbf24}
-.btn-success{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
-.btn-success:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(16,185,129,0.5)}
-.btn-group{display:flex;gap:10px;flex-wrap:wrap}
-.form-row{display:flex;gap:15px;margin-bottom:18px;flex-wrap:wrap}
-.form-input{flex:1;min-width:220px;padding:16px 20px;background:rgba(30,20,60,0.9);border:2px solid rgba(139,92,246,0.25);border-radius:14px;color:#fff;font-size:15px;transition:all 0.3s}
-.form-input:focus{outline:none;border-color:#8b5cf6;box-shadow:0 0 25px rgba(139,92,246,0.3);transform:scale(1.02)}
-.form-input::placeholder{color:#666}
-.key-status{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;text-transform:uppercase;background:rgba(16,185,129,0.25);color:#4ade80;border:1px solid rgba(16,185,129,0.35)}
-.message{padding:16px 22px;border-radius:14px;margin:18px 0;font-size:14px;text-align:center;font-weight:600;animation:shake 0.5s ease}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-.message.success{background:rgba(16,185,129,0.25);border:1px solid rgba(16,185,129,0.35);color:#4ade80}
-.message.error{background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.35);color:#f87171}
-.keys-list{display:flex;flex-direction:column;gap:12px;margin-top:18px}
-.key-item{background:rgba(20,15,45,0.9);border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;transition:all 0.3s}
-.key-item:hover{background:rgba(30,20,60,0.9);border-color:rgba(139,92,246,0.4);transform:translateX(5px)}
-.key-value{font-family:monospace;color:#e0b3ff;font-size:14px;font-weight:600}
-.key-meta{color:#888;font-size:12px}
-.empty-state{text-align:center;padding:60px 20px;color:#666;animation:fadeIn 1s ease}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);justify-content:center;align-items:center;z-index:1000;backdrop-filter:blur(8px)}
-.modal.active{display:flex;animation:fadeIn 0.3s ease}
-.modal-content{background:linear-gradient(145deg,rgba(25,18,50,0.98),rgba(18,12,40,0.98));border-radius:24px;padding:35px;max-width:700px;width:92%;max-height:88vh;overflow-y:auto;border:1px solid rgba(139,92,246,0.3);box-shadow:0 30px 90px rgba(0,0,0,0.6);animation:modalSlide 0.4s ease}
-@keyframes modalSlide{from{opacity:0;transform:scale(0.9) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;padding-bottom:20px;border-bottom:1px solid rgba(139,92,246,0.25)}
-.modal-title{color:#fff;font-size:22px;font-weight:700}
-.modal-close{background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.35);color:#f87171;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:18px;transition:all 0.3s;display:flex;align-items:center;justify-content:center}
-.modal-close:hover{background:rgba(239,68,68,0.4);transform:rotate(90deg)}
-.copy-btn{background:rgba(139,92,246,0.25);border:1px solid rgba(139,92,246,0.35);color:#a78bfa;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.3s}
-.copy-btn:hover{background:rgba(139,92,246,0.4);transform:scale(1.05)}
-.code-box{background:rgba(0,0,0,0.6);border:1px solid rgba(139,92,246,0.25);border-radius:16px;padding:20px;margin:20px 0;max-height:350px;overflow-y:auto}
-.code-box pre{color:#4ade80;font-family:monospace;font-size:11px;white-space:pre-wrap;word-break:break-all;line-height:1.6}
-.code-box::-webkit-scrollbar{width:8px}
-.code-box::-webkit-scrollbar-track{background:rgba(0,0,0,0.3);border-radius:10px}
-.code-box::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:10px}
-.code-box::-webkit-scrollbar-thumb:hover{background:rgba(139,92,246,0.6)}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { min-height: 100vh; background: #0a0a12; padding: 20px; font-family: system-ui, sans-serif; }
+.header { max-width: 1200px; margin: 0 auto 30px; display: flex; justify-content: space-between; align-items: center; padding: 25px 35px; background: rgba(20,15,40,0.95); border-radius: 20px; border: 1px solid rgba(139,92,246,0.25); }
+.logo { display: flex; align-items: center; gap: 15px; }
+.logo-icon { width: 55px; height: 55px; background: linear-gradient(135deg,#8b5cf6,#ec4899); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.header h1 { font-size: 28px; font-weight: 900; background: linear-gradient(135deg,#8b5cf6,#ec4899,#06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.user-email { color: #a78bfa; font-size: 14px; padding: 10px 18px; background: rgba(139,92,246,0.15); border-radius: 20px; }
+.btn-logout { padding: 12px 24px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.35); border-radius: 14px; color: #f87171; cursor: pointer; font-weight: 600; }
+.container { max-width: 1200px; margin: 0 auto; }
+.card { background: rgba(20,15,40,0.95); border-radius: 20px; padding: 32px; margin-bottom: 25px; border: 1px solid rgba(139,92,246,0.2); position: relative; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#8b5cf6,#ec4899,#06b6d4); }
+.card h2 { color: #fff; font-size: 22px; margin-bottom: 25px; font-weight: 700; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(320px,1fr)); gap: 18px; }
+.panel-item { background: rgba(30,20,60,0.9); border: 1px solid rgba(139,92,246,0.25); border-radius: 18px; padding: 25px; transition: all 0.3s; }
+.panel-item:hover { border-color: #8b5cf6; transform: translateY(-5px); }
+.panel-name { color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+.library-id { background: rgba(139,92,246,0.25); color: #e0b3ff; padding: 14px 18px; border-radius: 14px; font-family: monospace; font-size: 14px; display: flex; justify-content: space-between; margin-bottom: 18px; }
+.panel-meta { color: #888; font-size: 13px; margin-bottom: 18px; }
+.btn { padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; }
+.btn-primary { background: linear-gradient(135deg,#8b5cf6,#7c3aed); color: #fff; }
+.btn-secondary { background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.35); color: #a78bfa; }
+.btn-danger { background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.35); color: #f87171; }
+.btn-warning { background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.35); color: #fbbf24; }
+.btn-success { background: linear-gradient(135deg,#10b981,#059669); color: #fff; }
+.btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+.form-row { display: flex; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; }
+.form-input { flex: 1; min-width: 220px; padding: 16px 20px; background: rgba(30,20,60,0.9); border: 2px solid rgba(139,92,246,0.25); border-radius: 14px; color: #fff; font-size: 15px; }
+.form-input:focus { outline: none; border-color: #8b5cf6; }
+.form-input::placeholder { color: #666; }
+.key-status { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(16,185,129,0.25); color: #4ade80; }
+.message { padding: 16px; border-radius: 14px; margin: 18px 0; font-size: 14px; text-align: center; font-weight: 600; }
+.message.success { background: rgba(16,185,129,0.25); color: #4ade80; }
+.message.error { background: rgba(239,68,68,0.25); color: #f87171; }
+.keys-list { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+.key-item { background: rgba(20,15,45,0.9); border: 1px solid rgba(139,92,246,0.2); border-radius: 14px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+.key-value { font-family: monospace; color: #e0b3ff; font-size: 14px; }
+.key-meta { color: #888; font-size: 12px; }
+.empty-state { text-align: center; padding: 60px 20px; color: #666; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); justify-content: center; align-items: center; z-index: 1000; }
+.modal.active { display: flex; }
+.modal-content { background: rgba(25,18,50,0.98); border-radius: 24px; padding: 35px; max-width: 700px; width: 92%; max-height: 88vh; overflow-y: auto; border: 1px solid rgba(139,92,246,0.3); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(139,92,246,0.25); }
+.modal-title { color: #fff; font-size: 22px; font-weight: 700; }
+.modal-close { background: rgba(239,68,68,0.25); color: #f87171; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; border: none; font-size: 18px; }
+.copy-btn { background: rgba(139,92,246,0.25); color: #a78bfa; padding: 8px 14px; border-radius: 10px; cursor: pointer; border: none; font-size: 12px; }
+.code-box { background: rgba(0,0,0,0.6); border: 1px solid rgba(139,92,246,0.25); border-radius: 16px; padding: 20px; margin: 20px 0; max-height: 350px; overflow-y: auto; }
+.code-box pre { color: #4ade80; font-family: monospace; font-size: 11px; white-space: pre-wrap; word-break: break-all; }
 </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="glow glow1"></div>
-<div class="glow glow2"></div>
 <header class="header">
 <div class="logo"><div class="logo-icon">🚀</div><h1>LUAEXPRESS</h1></div>
-<div class="user-info"><span class="user-email" id="userEmail">Loading...</span><button class="btn-logout" onclick="logout()">Logout</button></div>
+<div style="display:flex;align-items:center;gap:15px"><span class="user-email" id="userEmail">Loading...</span><button class="btn-logout" onclick="logout()">Logout</button></div>
 </header>
 <div class="container">
-<div class="card"><h2>Create Panel</h2><div class="form-row"><input type="text" class="form-input" id="panelName" placeholder="Panel name (e.g., Auto Farm)" maxlength="30"><button class="btn btn-primary" onclick="createPanel()">Create Panel</button></div><div id="createMessage" class="message" style="display:none"></div></div>
-<div class="card"><h2>Your Panels</h2><div class="grid" id="panelsList"><div class="empty-state"><p>🎮 No panels yet - Create your first panel above!</p></div></div></div>
+<div class="card"><h2>⚡ Create Panel</h2><div class="form-row"><input type="text" class="form-input" id="panelName" placeholder="Panel name" maxlength="30"><button class="btn btn-primary" onclick="createPanel()">Create</button></div><div id="createMessage" class="message" style="display:none"></div></div>
+<div class="card"><h2>📋 Your Panels</h2><div class="grid" id="panelsList"><div class="empty-state"><p>No panels yet</p></div></div></div>
 </div>
-<div class="modal" id="keysModal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="modalTitle">Keys</h3><button class="modal-close" onclick="closeKeysModal()">✕</button></div><div class="form-row"><input type="text" class="form-input" id="keyDuration" placeholder="Duration: 1d, 7d, 30d, 1y, lifetime"><button class="btn btn-primary" onclick="generateKey()">Generate</button></div><p style="color:#666;font-size:12px;margin-bottom:15px">Examples: 1d, 7d, 30d, 1y, lifetime</p><div id="keyMessage" class="message" style="display:none"></div><div class="keys-list" id="modalKeysList"></div></div></div>
-<div class="modal" id="scriptModal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="scriptModalTitle">Script</h3><button class="modal-close" onclick="closeScriptModal()">✕</button></div><p style="color:#888;margin-bottom:12px">📋 Copy and paste on Pastefy or Pastebin:</p><div class="code-box"><pre id="scriptCode"></pre></div><button class="btn btn-success" onclick="copyScriptCode()" style="width:100%">📋 Copy Script</button></div></div>
+<div class="modal" id="keysModal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="modalTitle">Keys</h3><button class="modal-close" onclick="closeKeysModal()">✕</button></div><div class="form-row"><input type="text" class="form-input" id="keyDuration" placeholder="Duration: 1d, 7d, 30d, 1y, lifetime"><button class="btn btn-primary" onclick="generateKey()">Generate</button></div><p style="color:#666;font-size:12px;margin-bottom:15px">Ex: 1d, 7d, 30d, 1y, lifetime</p><div id="keyMessage" class="message" style="display:none"></div><div class="keys-list" id="modalKeysList"></div></div></div>
+<div class="modal" id="scriptModal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="scriptModalTitle">Script</h3><button class="modal-close" onclick="closeScriptModal()">✕</button></div><p style="color:#888;margin-bottom:12px">Copy to Pastefy/Pastebin:</p><div class="code-box"><pre id="scriptCode"></pre></div><button class="btn btn-success" onclick="copyScriptCode()" style="width:100%">📋 Copy</button></div></div>
 <script>
-var t=localStorage.getItem("token");if(!t)window.location.href="/login.html";document.getElementById("userEmail").textContent=localStorage.getItem("userEmail")||"User";var pid=null,sc="";loadPanels();function parseDuration(e){e=e.toLowerCase().trim();if(e==="lifetime"||e==="forever")return 315360000;var n=e.match(/^(\d+)\s*(d|w|m|y|h)$/);if(!n)return null;var r=parseInt(n[1]),i=n[2];return i==="h"?r*3600:i==="d"?r*86400:i==="w"?r*604800:i==="m"?r*2592000:i==="y"?r*31536000:null}function loadPanels(){fetch("/api/panels/list",{headers:{"Authorization":"Bearer "+t}}).then(e=>e.json()).then(e=>{if(e.panels)renderPanels(e.panels)})}function renderPanels(e){var n=document.getElementById("panelsList");if(!e.length){n.innerHTML="<div class='empty-state'><p>🎮 No panels yet!</p></div>";return}var r="";e.forEach((e,i)=>{setTimeout(()=>{r+="<div class='panel-item' style='animation-delay:"+(i*0.1)+"s'><div class='panel-name'>"+e.name+"</div><div class='library-id'><span>ID: "+e.libraryId+"</span><button class='copy-btn' onclick=\"copyText('"+e.libraryId+"')\">Copy</button></div><div class='panel-meta'>"+e.keyCount+" keys | "+e.createdAt+"</div><div class='btn-group'><button class='btn btn-secondary' onclick=\"openKeys('"+e.libraryId+"','"+e.name+"')\">🔑 Keys</button><button class='btn btn-success' onclick=\"openScript('"+e.libraryId+"','"+e.name+"')\">📜 Script</button><button class='btn btn-danger' onclick=\"deletePanel('"+e.libraryId+"')\">🗑️</button></div></div>";if(i===e.length-1)n.innerHTML=r},50*i)});setTimeout(()=>n.innerHTML=r,50*e.length)}function createPanel(){var e=document.getElementById("panelName").value.trim(),n=document.getElementById("createMessage");if(!e){showMsg(n,"Enter panel name","error");return}fetch("/api/panels/create",{method:"POST",headers:{"Authorization":"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({name:e})}).then(e=>e.json()).then(e=>{if(e.success){showMsg(n,"✅ Created! ID: "+e.panel.libraryId,"success");document.getElementById("panelName").value="";loadPanels()}else showMsg(n,e.error,"error")})}function deletePanel(e){if(!confirm("Delete panel and all keys?"))return;fetch("/api/panels/delete",{method:"POST",headers:{"Authorization":"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({libraryId:e})}).then(()=>loadPanels())}function openKeys(e,n){pid=e;document.getElementById("modalTitle").textContent="🔑 "+n;document.getElementById("keysModal").classList.add("active");document.getElementById("keyDuration").value="";loadKeys()}function closeKeysModal(){document.getElementById("keysModal").classList.remove("active")}function loadKeys(){fetch("/api/keys/list?panelId="+pid,{headers:{"Authorization":"Bearer "+t}}).then(e=>e.json()).then(e=>renderKeys(e.keys||[]))}function renderKeys(e){var n=document.getElementById("modalKeysList");if(!e.length){n.innerHTML="<div class='empty-state'>No keys yet</div>";return}n.innerHTML=e.map(e=>"<div class='key-item'><div><div class='key-value'>"+e.key+"</div><div class='key-meta'>"+e.expiresIn+" | HWID: "+(e.hwid?"Linked":"Free")+"</div></div><div class='btn-group'><button class='btn btn-secondary' onclick=\"copyText('"+e.key+"')\">📋</button><button class='btn btn-warning' onclick=\"resetHWID('"+e.key+"')\">🔄</button><button class='btn btn-danger' onclick=\"deleteKey('"+e.key+"')\">🗑️</button></div></div>").join("")}function generateKey(){var e=document.getElementById("keyDuration").value,n=document.getElementById("keyMessage"),r=parseDuration(e);if(!r){showMsg(n,"❌ Invalid. Use: 1d, 7d, 1y, lifetime","error");return}fetch("/api/keys/generate",{method:"POST",headers:{"Authorization":"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({duration:r,panelId:pid})}).then(e=>e.json()).then(e=>{if(e.success){showMsg(n,"✅ Key: "+e.key,"success");loadKeys();loadPanels()}else showMsg(n,e.error,"error")})}function resetHWID(e){if(!confirm("Reset HWID?"))return;fetch("/api/keys/reset-hwid",{method:"POST",headers:{"Authorization":"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({key:e})}).then(()=>loadKeys())}function deleteKey(e){if(!confirm("Delete key?"))return;fetch("/api/keys/delete",{method:"POST",headers:{"Authorization":"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({key:e})}).then(()=>{loadKeys();loadPanels()})}function openScript(e,n){var r=window.location.origin,i="-- "+n+" | LuaExpress Key System\n-- Library ID: "+e+"\n\nlocal API=\""+r+"/api/keys/verify\"\nlocal PID=\""+e+"\"\nlocal Http=game:GetService(\"HttpService\")\n\nlocal function hwid()\n    local ok,h=pcall(function() return game:GetService(\"RbxAnalyticsService\"):GetClientId() end)\n    return ok and h or \"unknown\"\nend\n\nlocal function verify(k)\n    local u=API..\"?key=\"..k..\"&hwid=\"..hwid()..\"&panelId=\"..PID\n    local ok,r=pcall(function() return Http:JSONDecode(game:HttpGet(u)) end)\n    return ok and r or {valid=false,error=\"Connection error\"}\nend\n\nlocal function ui()\n    if game.CoreGui:FindFirstChild(\"LuaExpressUI\") then game.CoreGui.LuaExpressUI:Destroy() end\n    local SG=Instance.new(\"ScreenGui\") SG.Name=\"LuaExpressUI\" SG.Parent=game.CoreGui\n    local MF=Instance.new(\"Frame\") MF.Parent=SG MF.BackgroundColor3=Color3.fromRGB(15,10,30) MF.BorderSizePixel=0 MF.Position=UDim2.new(0.5,-200,0.5,-140) MF.Size=UDim2.new(0,400,0,280) MF.Active=true MF.Draggable=true\n    local UC=Instance.new(\"UICorner\") UC.CornerRadius=UDim.new(0,16) UC.Parent=MF\n    local US=Instance.new(\"UIStroke\") US.Color=Color3.fromRGB(139,92,246) US.Thickness=2 US.Parent=MF\n    local TL=Instance.new(\"TextLabel\") TL.Parent=MF TL.BackgroundTransparency=1 TL.Position=UDim2.new(0,0,0,20) TL.Size=UDim2.new(1,0,0,40) TL.Font=Enum.Font.GothamBold TL.Text=\""+n+"\" TL.TextColor3=Color3.fromRGB(139,92,246) TL.TextSize=24\n    local ST=Instance.new(\"TextLabel\") ST.Parent=MF ST.BackgroundTransparency=1 ST.Position=UDim2.new(0,0,0,55) ST.Size=UDim2.new(1,0,0,25) ST.Font=Enum.Font.Gotham ST.Text=\"Enter your key\" ST.TextColor3=Color3.fromRGB(136,136,136) ST.TextSize=14\n    local KB=Instance.new(\"TextBox\") KB.Parent=MF KB.BackgroundColor3=Color3.fromRGB(30,20,50) KB.BorderSizePixel=0 KB.Position=UDim2.new(0.1,0,0,95) KB.Size=UDim2.new(0.8,0,0,45) KB.Font=Enum.Font.GothamMedium KB.PlaceholderText=\"KEY-XXXX\" KB.Text=\"\" KB.TextColor3=Color3.fromRGB(255,255,255) KB.TextSize=15\n    local KC=Instance.new(\"UICorner\") KC.CornerRadius=UDim.new(0,10) KC.Parent=KB\n    local VB=Instance.new(\"TextButton\") VB.Parent=MF VB.BackgroundColor3=Color3.fromRGB(139,92,246) VB.BorderSizePixel=0 VB.Position=UDim2.new(0.1,0,0,155) VB.Size=UDim2.new(0.8,0,0,45) VB.Font=Enum.Font.GothamBold VB.Text=\"VERIFY KEY\" VB.TextColor3=Color3.fromRGB(255,255,255) VB.TextSize=16\n    local VC=Instance.new(\"UICorner\") VC.CornerRadius=UDim.new(0,10) VC.Parent=VB\n    local SL=Instance.new(\"TextLabel\") SL.Parent=MF SL.BackgroundTransparency=1 SL.Position=UDim2.new(0,0,0,210) SL.Size=UDim2.new(1,0,0,40) SL.Font=Enum.Font.Gotham SL.Text=\"\" SL.TextColor3=Color3.fromRGB(255,255,255) SL.TextSize=14 SL.TextWrapped=true\n    local CB=Instance.new(\"TextButton\") CB.Parent=MF CB.BackgroundTransparency=1 CB.Position=UDim2.new(1,-35,0,5) CB.Size=UDim2.new(0,30,0,30) CB.Font=Enum.Font.GothamBold CB.Text=\"X\" CB.TextColor3=Color3.fromRGB(255,100,100) CB.TextSize=18\n    CB.MouseButton1Click:Connect(function() SG:Destroy() end)\n    VB.MouseButton1Click:Connect(function()\n        local key=KB.Text\n        if key==\"\" then SL.TextColor3=Color3.fromRGB(255,100,100) SL.Text=\"Enter a key\" return end\n        SL.TextColor3=Color3.fromRGB(255,255,0) SL.Text=\"Verifying...\" VB.Text=\"WAIT...\"\n        task.wait(0.5)\n        local result=verify(key)\n        if result.valid then\n            SL.TextColor3=Color3.fromRGB(100,255,100) SL.Text=\"Key valid!\" VB.Text=\"SUCCESS!\"\n            task.wait(2) SG:Destroy()\n            print(\"✅ Key verified! Loading script...\")\n            -- PUT YOUR SCRIPT HERE\n        else\n            SL.TextColor3=Color3.fromRGB(255,100,100) SL.Text=result.error or \"Invalid\" VB.Text=\"VERIFY KEY\"\n        end\n    end)\nend\n\nui()\nprint(\"🚀 "+n+" | LuaExpress loaded!\")";sc=i;document.getElementById("scriptModalTitle").textContent=n+" Script";document.getElementById("scriptCode").textContent=i;document.getElementById("scriptModal").classList.add("active")}function closeScriptModal(){document.getElementById("scriptModal").classList.remove("active")}function copyScriptCode(){navigator.clipboard.writeText(sc);alert("✅ Script copied!")}function copyText(e){navigator.clipboard.writeText(e);alert("✅ Copied!")}function showMsg(e,n,r){e.className="message "+r;e.textContent=n;e.style.display="block";setTimeout(()=>e.style.display="none",5000)}function logout(){localStorage.removeItem("token");localStorage.removeItem("userEmail");window.location.href="/login.html"}
+var token = localStorage.getItem("token");
+if (!token) window.location.href = "/login.html";
+document.getElementById("userEmail").textContent = localStorage.getItem("userEmail") || "User";
+var currentPanelId = null, currentScriptCode = "";
+loadPanels();
+
+function parseDuration(input) {
+    input = input.toLowerCase().trim();
+    if (input === "lifetime" || input === "forever") return 315360000;
+    var match = input.match(/^(\d+)\s*(d|w|m|y|h)$/);
+    if (!match) return null;
+    var num = parseInt(match[1]), unit = match[2];
+    if (unit === "h") return num * 3600;
+    if (unit === "d") return num * 86400;
+    if (unit === "w") return num * 604800;
+    if (unit === "m") return num * 2592000;
+    if (unit === "y") return num * 31536000;
+    return null;
+}
+
+function loadPanels() {
+    fetch("/api/panels/list", { headers: { "Authorization": "Bearer " + token } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { if (data.panels) renderPanels(data.panels); });
+}
+
+function renderPanels(panels) {
+    var c = document.getElementById("panelsList");
+    if (!panels.length) { c.innerHTML = "<div class='empty-state'><p>No panels yet</p></div>"; return; }
+    var html = "";
+    for (var i = 0; i < panels.length; i++) {
+        var p = panels[i];
+        html += "<div class='panel-item'><div class='panel-name'>" + p.name + "</div>";
+        html += "<div class='library-id'><span>ID: " + p.libraryId + "</span><button class='copy-btn' onclick=\"copyText('" + p.libraryId + "')\">Copy</button></div>";
+        html += "<div class='panel-meta'>" + p.keyCount + " keys | " + p.createdAt + "</div><div class='btn-group'>";
+        html += "<button class='btn btn-secondary' onclick=\"openKeys('" + p.libraryId + "','" + p.name + "')\">🔑 Keys</button>";
+        html += "<button class='btn btn-success' onclick=\"openScript('" + p.libraryId + "','" + p.name + "')\">📜 Script</button>";
+        html += "<button class='btn btn-danger' onclick=\"deletePanel('" + p.libraryId + "')\">🗑️</button></div></div>";
+    }
+    c.innerHTML = html;
+}
+
+function createPanel() {
+    var name = document.getElementById("panelName").value.trim();
+    var msg = document.getElementById("createMessage");
+    if (!name) { showMsg(msg, "Enter name", "error"); return; }
+    fetch("/api/panels/create", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name })
+    }).then(function(r) { return r.json(); }).then(function(data) {
+        if (data.success) { showMsg(msg, "Created! ID: " + data.panel.libraryId, "success"); document.getElementById("panelName").value = ""; loadPanels(); }
+        else showMsg(msg, data.error, "error");
+    });
+}
+
+function deletePanel(id) {
+    if (!confirm("Delete?")) return;
+    fetch("/api/panels/delete", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ libraryId: id }) }).then(function() { loadPanels(); });
+}
+
+function openKeys(id, name) {
+    currentPanelId = id;
+    document.getElementById("modalTitle").textContent = "🔑 " + name;
+    document.getElementById("keysModal").classList.add("active");
+    document.getElementById("keyDuration").value = "";
+    loadKeys();
+}
+
+function closeKeysModal() { document.getElementById("keysModal").classList.remove("active"); }
+
+function loadKeys() {
+    fetch("/api/keys/list?panelId=" + currentPanelId, { headers: { "Authorization": "Bearer " + token } })
+    .then(function(r) { return r.json(); }).then(function(data) { renderKeys(data.keys || []); });
+}
+
+function renderKeys(keys) {
+    var c = document.getElementById("modalKeysList");
+    if (!keys.length) { c.innerHTML = "<div class='empty-state'>No keys</div>"; return; }
+    var html = "";
+    for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        html += "<div class='key-item'><div><div class='key-value'>" + k.key + "</div><div class='key-meta'>" + k.expiresIn + " | HWID: " + (k.hwid ? "Yes" : "No") + "</div></div><div class='btn-group'>";
+        html += "<button class='btn btn-secondary' onclick=\"copyText('" + k.key + "')\">📋</button>";
+        html += "<button class='btn btn-warning' onclick=\"resetHWID('" + k.key + "')\">🔄</button>";
+        html += "<button class='btn btn-danger' onclick=\"deleteKey('" + k.key + "')\">🗑️</button></div></div>";
+    }
+    c.innerHTML = html;
+}
+
+function generateKey() {
+    var dur = document.getElementById("keyDuration").value;
+    var msg = document.getElementById("keyMessage");
+    var duration = parseDuration(dur);
+    if (!duration) { showMsg(msg, "Invalid. Use: 1d, 7d, 1y, lifetime", "error"); return; }
+    fetch("/api/keys/generate", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ duration: duration, panelId: currentPanelId }) })
+    .then(function(r) { return r.json(); }).then(function(data) {
+        if (data.success) { showMsg(msg, "Key: " + data.key, "success"); loadKeys(); loadPanels(); }
+        else showMsg(msg, data.error, "error");
+    });
+}
+
+function resetHWID(key) {
+    if (!confirm("Reset HWID?")) return;
+    fetch("/api/keys/reset-hwid", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ key: key }) }).then(function() { loadKeys(); });
+}
+
+function deleteKey(key) {
+    if (!confirm("Delete?")) return;
+    fetch("/api/keys/delete", { method: "POST", headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ key: key }) }).then(function() { loadKeys(); loadPanels(); });
+}
+
+function openScript(id, name) {
+    var url = window.location.origin;
+    var script = "-- " + name + " | LuaExpress\n-- ID: " + id + "\n\nlocal API=\"" + url + "/api/keys/verify\"\nlocal PID=\"" + id + "\"\nlocal Http=game:GetService(\"HttpService\")\n\nlocal function hwid() local ok,h=pcall(function() return game:GetService(\"RbxAnalyticsService\"):GetClientId() end) return ok and h or \"x\" end\n\nlocal function verify(k) local u=API..\"?key=\"..k..\"&hwid=\"..hwid()..\"&panelId=\"..PID local ok,r=pcall(function() return Http:JSONDecode(game:HttpGet(u)) end) return ok and r or {valid=false,error=\"Error\"} end\n\nlocal function ui() if game.CoreGui:FindFirstChild(\"LuaExpressUI\") then game.CoreGui.LuaExpressUI:Destroy() end\nlocal SG=Instance.new(\"ScreenGui\") SG.Name=\"LuaExpressUI\" SG.Parent=game.CoreGui\nlocal MF=Instance.new(\"Frame\") MF.Parent=SG MF.BackgroundColor3=Color3.fromRGB(15,10,30) MF.Position=UDim2.new(0.5,-200,0.5,-140) MF.Size=UDim2.new(0,400,0,280) MF.Active=true MF.Draggable=true\nlocal UC=Instance.new(\"UICorner\") UC.CornerRadius=UDim.new(0,16) UC.Parent=MF\nlocal US=Instance.new(\"UIStroke\") US.Color=Color3.fromRGB(139,92,246) US.Thickness=2 US.Parent=MF\nlocal TL=Instance.new(\"TextLabel\") TL.Parent=MF TL.BackgroundTransparency=1 TL.Position=UDim2.new(0,0,0,20) TL.Size=UDim2.new(1,0,0,40) TL.Font=Enum.Font.GothamBold TL.Text=\"" + name + "\" TL.TextColor3=Color3.fromRGB(139,92,246) TL.TextSize=24\nlocal ST=Instance.new(\"TextLabel\") ST.Parent=MF ST.BackgroundTransparency=1 ST.Position=UDim2.new(0,0,0,55) ST.Size=UDim2.new(1,0,0,25) ST.Font=Enum.Font.Gotham ST.Text=\"Enter your key\" ST.TextColor3=Color3.fromRGB(136,136,136) ST.TextSize=14\nlocal KB=Instance.new(\"TextBox\") KB.Parent=MF KB.BackgroundColor3=Color3.fromRGB(30,20,50) KB.Position=UDim2.new(0.1,0,0,95) KB.Size=UDim2.new(0.8,0,0,45) KB.Font=Enum.Font.GothamMedium KB.PlaceholderText=\"KEY-XXXX\" KB.Text=\"\" KB.TextColor3=Color3.fromRGB(255,255,255) KB.TextSize=15\nlocal KC=Instance.new(\"UICorner\") KC.CornerRadius=UDim.new(0,10) KC.Parent=KB\nlocal VB=Instance.new(\"TextButton\") VB.Parent=MF VB.BackgroundColor3=Color3.fromRGB(139,92,246) VB.Position=UDim2.new(0.1,0,0,155) VB.Size=UDim2.new(0.8,0,0,45) VB.Font=Enum.Font.GothamBold VB.Text=\"VERIFY KEY\" VB.TextColor3=Color3.fromRGB(255,255,255) VB.TextSize=16\nlocal VC=Instance.new(\"UICorner\") VC.CornerRadius=UDim.new(0,10) VC.Parent=VB\nlocal SL=Instance.new(\"TextLabel\") SL.Parent=MF SL.BackgroundTransparency=1 SL.Position=UDim2.new(0,0,0,210) SL.Size=UDim2.new(1,0,0,40) SL.Font=Enum.Font.Gotham SL.Text=\"\" SL.TextColor3=Color3.fromRGB(255,255,255) SL.TextSize=14 SL.TextWrapped=true\nlocal CB=Instance.new(\"TextButton\") CB.Parent=MF CB.BackgroundTransparency=1 CB.Position=UDim2.new(1,-35,0,5) CB.Size=UDim2.new(0,30,0,30) CB.Font=Enum.Font.GothamBold CB.Text=\"X\" CB.TextColor3=Color3.fromRGB(255,100,100) CB.TextSize=18\nCB.MouseButton1Click:Connect(function() SG:Destroy() end)\nVB.MouseButton1Click:Connect(function() local key=KB.Text if key==\"\" then SL.TextColor3=Color3.fromRGB(255,100,100) SL.Text=\"Enter a key\" return end SL.TextColor3=Color3.fromRGB(255,255,0) SL.Text=\"Verifying...\" VB.Text=\"WAIT...\" task.wait(0.5) local result=verify(key) if result.valid then SL.TextColor3=Color3.fromRGB(100,255,100) SL.Text=\"Valid!\" VB.Text=\"OK!\" task.wait(2) SG:Destroy() print(\"Key OK\") else SL.TextColor3=Color3.fromRGB(255,100,100) SL.Text=result.error or \"Invalid\" VB.Text=\"VERIFY KEY\" end end) end\n\nui()\nprint(\"" + name + " loaded!\")";
+    currentScriptCode = script;
+    document.getElementById("scriptModalTitle").textContent = name;
+    document.getElementById("scriptCode").textContent = script;
+    document.getElementById("scriptModal").classList.add("active");
+}
+
+function closeScriptModal() { document.getElementById("scriptModal").classList.remove("active"); }
+function copyScriptCode() { navigator.clipboard.writeText(currentScriptCode); alert("Copied!"); }
+function copyText(text) { navigator.clipboard.writeText(text); alert("Copied!"); }
+function showMsg(el, txt, type) { el.className = "message " + type; el.textContent = txt; el.style.display = "block"; setTimeout(function() { el.style.display = "none"; }, 5000); }
+function logout() { localStorage.removeItem("token"); localStorage.removeItem("userEmail"); window.location.href = "/login.html"; }
 </script>
 </body>
 </html>
