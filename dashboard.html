@@ -29,8 +29,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
+            z-index: -2;
             overflow: hidden;
+            pointer-events: none;
         }
 
         .anime-bg::before {
@@ -58,15 +59,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://media.tenor.com/jcFLD_XM25IAAAAd/anime-aesthetic.gif') center/cover;
-            opacity: 0.08;
-            filter: blur(2px) brightness(0.7);
+            background: 
+                url('https://i.pinimg.com/originals/8d/a3/24/8da324c6b2e194e80b310b6ae0f3efd6.gif') center/cover,
+                url('https://i.pinimg.com/originals/ca/27/25/ca2725d5bd449b433d57ceba93cb14ea.gif') center/cover,
+                url('https://media.giphy.com/media/26BRuo6sLetdllPAQ/giphy.gif') center/cover;
+            opacity: 0.2;
+            filter: blur(1px) brightness(0.9) saturate(1.2);
             animation: subtleMove 30s ease-in-out infinite;
+            mix-blend-mode: screen;
         }
 
         @keyframes subtleMove {
             0%, 100% { transform: scale(1) translate(0, 0); }
-            50% { transform: scale(1.1) translate(20px, 20px); }
+            50% { transform: scale(1.05) translate(10px, 10px); }
         }
 
         /* Floating particles */
@@ -77,7 +82,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1;
+            z-index: -1;
         }
 
         .particle {
@@ -88,6 +93,14 @@
             border-radius: 50%;
             box-shadow: 0 0 10px rgba(138, 92, 246, 0.8);
             animation: floatParticle linear infinite;
+        }
+
+        .anime-emoji {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.6;
+            animation: floatParticle linear infinite;
+            pointer-events: none;
         }
 
         @keyframes floatParticle {
@@ -115,7 +128,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1;
+            z-index: -1;
             overflow: hidden;
         }
 
@@ -151,10 +164,11 @@
 
         .app-container {
             position: relative;
-            z-index: 2;
+            z-index: 10;
             max-width: 1600px;
             margin: 0 auto;
             padding: 30px 20px;
+            pointer-events: auto;
         }
 
         /* Epic Header */
@@ -923,8 +937,9 @@
             backdrop-filter: blur(15px);
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 9999;
             animation: modalFadeIn 0.4s ease-out;
+            pointer-events: auto;
         }
 
         @keyframes modalFadeIn {
@@ -1128,6 +1143,13 @@
         <div class="anime-bg-image"></div>
     </div>
 
+    <!-- Anime Corner Decoration -->
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 5; pointer-events: none; opacity: 0.4;">
+        <img src="https://i.pinimg.com/originals/a2/dc/96/a2dc968b98c25320977c75eb5f6130af.gif" 
+             style="width: 150px; height: auto; border-radius: 15px; box-shadow: 0 10px 40px rgba(138, 92, 246, 0.5);"
+             alt="anime decoration">
+    </div>
+
     <!-- Floating Particles -->
     <div class="particles" id="particles"></div>
 
@@ -1252,8 +1274,10 @@
         function createParticles() {
             const container = document.getElementById('particles');
             const particleCount = 40;
+            const animeEmojis = ['⭐', '✨', '💫', '🌟', '🎮', '🎯', '🔥', '⚡', '💎', '🌈'];
             
             for (let i = 0; i < particleCount; i++) {
+                // Partículas normais
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
@@ -1262,6 +1286,17 @@
                 particle.style.width = (Math.random() * 3 + 2) + 'px';
                 particle.style.height = particle.style.width;
                 container.appendChild(particle);
+                
+                // Adicionar alguns emojis de anime também
+                if (i % 4 === 0) {
+                    const emoji = document.createElement('div');
+                    emoji.className = 'anime-emoji';
+                    emoji.textContent = animeEmojis[Math.floor(Math.random() * animeEmojis.length)];
+                    emoji.style.left = Math.random() * 100 + '%';
+                    emoji.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                    emoji.style.animationDelay = Math.random() * 5 + 's';
+                    container.appendChild(emoji);
+                }
             }
         }
 
