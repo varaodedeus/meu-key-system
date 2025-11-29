@@ -33,17 +33,40 @@ export default async function handler(req, res) {
 
         const userKeys = await keysCollection.find(query).toArray();
 
-        const keys = userKeys.map(k => ({
-            key: k.key,
-            panelId: k.panelId,
-            panelName: k.panelName,
-            active: k.active && k.expiresAt > Date.now(),
-            expiresIn: formatTimeRemaining(k.expiresAt),
-            uses: k.uses,
-            maxUses: k.maxUses,
-            hwid: k.hwid ? true : false,
-            createdAt: new Date(k.createdAt).toLocaleDateString()
-        }));
+        const keys = userKeys.map(k => {
+            let status = '🟢 Ativa';
+            let expiresIn = 'Não ativada';
+            
+            // Se nunca foi usada
+            if (!k.firstUseAt) {
+                status = '🟡 Não ativada';
+                const durationDays = k.duration / 86400;
+                expiresIn = durationDays >= 365 ? 'Lifetime' : `${durationDays}d (após ativação)`;
+            } 
+            // Se já foi usada
+            else {
+                if (k.expiresAt < Date.now()) {
+                    status = '🔴 Expirada';
+                    expiresIn = 'Expirada';
+                } else {
+                    expiresIn = formatTimeRemaining(k.expiresAt);
+                }
+            }
+
+            return {
+                key: k.key,
+                panelId: k.panelId,
+                panelName: k.panelName,
+                active: k.active && (!k.expiresAt || k.expiresAt > Date.now()),
+                expiresIn: expiresIn,
+                status: status,
+                uses: k.uses,
+                maxUses: k.maxUses,
+                hwid: k.hwid ? true : false,
+                createdAt: new Date(k.createdAt).toLocaleDateString(),
+                firstUseAt: k.firstUseAt ? new Date(k.firstUseAt).toLocaleDateString() : 'Nunca'
+            };
+        });
 
         return res.status(200).json({
             success: true,
