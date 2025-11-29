@@ -4,24 +4,24 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    
+
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
-    
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
     const token = req.headers.authorization;
     const email = getUserFromToken(token);
-    
+
     if (!email) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const { duration = 86400, panelId } = req.body;
-    
+
     if (!panelId) {
         return res.status(400).json({ error: 'Panel ID is required' });
     }
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
         // Verificar se painel existe e pertence ao usuário
         const panel = await panelsCollection.findOne({ libraryId: panelId, owner: email });
-        
+
         if (!panel) {
             return res.status(404).json({ error: 'Panel not found' });
         }
@@ -46,9 +46,7 @@ export default async function handler(req, res) {
             panelName: panel.name,
             owner: email,
             createdAt: Date.now(),
-            firstUseAt: null, // ← NOVO: Armazena quando foi usado pela primeira vez
-            expiresAt: null,  // ← NOVO: Só é definido após primeiro uso
-            duration: duration, // ← NOVO: Guarda a duração para calcular depois
+            expiresAt: Date.now() + (duration * 1000),
             maxUses: 999,
             uses: 0,
             active: true,
@@ -60,8 +58,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
             success: true,
             key: keyValue,
-            expiresIn: duration >= 31536000 ? 'Lifetime' : `${duration / 86400}d`,
-            message: 'Key criada! Timer começa no primeiro uso.'
+            expiresIn: duration >= 31536000 ? 'Lifetime' : `${duration / 86400}d`
         });
 
     } catch (error) {
