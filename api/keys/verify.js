@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
     // Aceitar GET e POST
     let key, hwid, panelId;
-    
+
     if (req.method === 'GET') {
         key = req.query.key;
         hwid = req.query.hwid;
@@ -42,46 +42,42 @@ export default async function handler(req, res) {
             return res.status(200).json({ valid: false, error: 'Invalid key' });
         }
 
-        // ✅ PRIMEIRA VEZ USANDO A KEY
-        if (!foundKey.firstUseAt) {
-            const now = Date.now();
-            const expiresAt = now + (foundKey.duration * 1000);
-
-            await keysCollection.updateOne(
-                { key },
-                { 
-                    $set: { 
-                        hwid: hwid || null,
-                        firstUseAt: now,
-                        expiresAt: expiresAt,
-                        lastUsed: now
-                    },
-                    $inc: { uses: 1 }
-                }
-            );
-
-            const hoursRemaining = Math.floor((expiresAt - now) / (1000 * 60 * 60));
-
-            return res.status(200).json({
-                valid: true,
-                message: 'Key ativada com sucesso! Timer iniciado.',
-                data: {
-                    panelName: foundKey.panelName,
-                    usesRemaining: foundKey.maxUses - 1,
-                    expiresIn: hoursRemaining > 24 ? Math.floor(hoursRemaining/24) + 'd' : hoursRemaining + 'h',
-                    firstUse: true
-                }
-            });
-        }
-
-        // ✅ KEY JÁ FOI USADA ANTES
-
-        // Verificar expiração
         if (foundKey.expiresAt < Date.now()) {
             await keysCollection.updateOne({ key }, { $set: { active: false } });
             return res.status(200).json({ valid: false, error: 'Key expired' });
         }
 
-        // Verificar HWID
         if (foundKey.hwid && foundKey.hwid !== hwid) {
-            return res.status(200).json({ vali
+            return res.status(200).json({ valid: false, error: 'Key linked to another device' });
+        }
+
+        if (foundKey.uses >= foundKey.maxUses) {
+            await keysCollection.updateOne({ key }, { $set: { active: false } });
+            return res.status(200).json({ valid: false, error: 'Key usage limit reached' });
+        }
+
+        await keysCollection.updateOne(
+            { key },
+            { 
+                $set: { hwid: hwid || foundKey.hwid, lastUsed: Date.now() },
+                $inc: { uses: 1 }
+            }
+        );
+
+        const hoursRemaining = Math.floor((foundKey.expiresAt - Date.now()) / (1000 * 60 * 60));
+
+        return res.status(200).json({
+            valid: true,
+            message: 'Key is valid!',
+            data: {
+                panelName: foundKey.panelName,
+                usesRemaining: foundKey.maxUses - foundKey.uses - 1,
+                expiresIn: hoursRemaining > 24 ? Math.floor(hoursRemaining/24) + 'd' : hoursRemaining + 'h'
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(200).json({ valid: false, error: 'Server error' });
+    }
+}
